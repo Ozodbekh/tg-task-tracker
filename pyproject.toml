@@ -1,0 +1,28 @@
+[project]
+name = "tg-task-tracker"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "backend",
+]
+
+[tool.uv.workspace]
+members = ["backend"]
+
+[tool.uv.sources]
+backend = { workspace = true }
+
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["backend/tests"]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.9",
+]
