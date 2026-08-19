@@ -18,9 +18,13 @@ rules.
   message's sender.
 - `handlers.py` — `TaskEventHandler` subscribes to `NewMessage` and
   `MessageEdited`.
+- `digest.py` — `DigestSender` renders the Uzbek weekly summary and sends it to
+  each employee's private chat. A failed send is logged and the run continues.
 
 Notes:
 
 - Only outgoing messages create tasks; incoming ones can only carry status tags.
 - On edit, an outgoing message that lost its `#task` tag cancels the task.
 - A `#task` message with no resolvable assignee is recorded as unresolved.
+- The digest reports two counts the system does not track yet, paused and
+  externally blocked; both are always `0`.

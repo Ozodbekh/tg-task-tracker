@@ -8,11 +8,13 @@ SQL and the SQLite connection. The only layer that writes SQL.
 - `schema.sql` — full schema, applied idempotently on every start.
 - `filters.py` — turns `TaskFilters` and a `DateRange` into a parameterised
   `WHERE` clause, and names the two `FROM` sources every query joins through.
+  `range_clause` builds the date window on its own, for queries with no filters.
 - `employees.py` — `EmployeeRepository`: upsert by `telegram_id`, get, list.
 - `chats.py` — `ChatRepository`: upsert by `telegram_id`, get, list.
 - `tasks.py` — `TaskRepository`: task writes, events, unresolved messages, and
   the read queries behind the panel lists.
-- `stats.py` — `StatsRepository`: the aggregate queries behind the dashboard.
+- `stats.py` — `StatsRepository`: the aggregate queries behind the dashboard,
+  plus the per-employee digest counts.
 - `seed.py` — `Seeder`, run through `make seed`. Wipes every table and writes a
   deterministic fake dataset spanning the last 400 days.
 

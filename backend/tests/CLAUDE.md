@@ -9,6 +9,8 @@ Mirrors the `app/` package layout.
   status flow, rejected status replies, cancel and revive, chat isolation.
 - `services/test_auth.py` — password hashing, token issuing, expiry, foreign
   secrets.
+- `services/test_digest.py` — weekly counts per status, employees without a
+  task, the Monday window, and the rendered message.
 - `api/conftest.py` — a seeded database behind an `httpx.AsyncClient` driving
   the ASGI app in-process, plus a signed-in client.
 - `api/test_panel.py` — auth enforcement, filters, pagination, embedded rows,

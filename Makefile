@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install hash-password login seed run test lint format check clean
+.PHONY: help install hash-password login seed run digest test lint format check clean
 
 help:
 	@grep -E '^[a-z-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "%-10s %s\n", $$1, $$2}'
@@ -18,6 +18,9 @@ seed: ## Fill the database with fake rows for UI testing
 
 run: ## Run the Telegram listener
 	uv run python -m app.main
+
+digest: ## Send the weekly digest to every employee with a task this week
+	uv run python -m app.digest
 
 test: ## Run the test suite
 	uv run pytest -q

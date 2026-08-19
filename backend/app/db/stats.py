@@ -7,6 +7,7 @@ from app.db.filters import (
     TASK_SOURCE,
     UNRESOLVED_SOURCE,
     FilterClause,
+    range_clause,
     task_clause,
     unresolved_clause,
 )
@@ -14,6 +15,8 @@ from app.models.filters import Bucket, DateRange, TaskFilters
 from app.models.page import Pagination
 
 OVERDUE_DAYS = 3
+
+DIGEST_SOURCE = "tasks t JOIN employees e ON e.id = t.employee_id"
 
 COUNT_COLUMNS = """
     COUNT(*) AS total,
@@ -166,6 +169,17 @@ class StatsRepository:
         """
         rows = await self._fetch_all(sql, clause.parameters)
         return {row["chat_id"]: int(row["total"]) for row in rows}
+
+    async def digest(self, window: DateRange) -> list[aiosqlite.Row]:
+        clause = range_clause("t.created_at", window)
+        sql = f"""
+            SELECT e.telegram_id, e.name, {COUNT_COLUMNS}
+            FROM {DIGEST_SOURCE}
+            WHERE {clause.sql}
+            GROUP BY e.id
+            ORDER BY e.name
+        """
+        return await self._fetch_all(sql, clause.parameters)
 
     async def _fetch_one(self, sql: str, parameters: list[object]) -> aiosqlite.Row:
         async with self._database.cursor() as cursor:

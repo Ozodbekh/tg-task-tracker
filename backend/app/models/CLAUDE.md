@@ -12,5 +12,6 @@ Pydantic models. Everything crossing a layer boundary is defined here.
   the period-to-days table and the default bucket per period.
 - `stats.py` — the dashboard aggregates.
 - `page.py` — `Pagination` and the generic `Page`.
+- `digest.py` — `EmployeeDigest`, one employee's totals for the current week.
 
 `*Identity` models carry Telegram ids; stored models carry internal row ids.
