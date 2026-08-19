@@ -5,6 +5,8 @@ rules.
 
 - `client.py` — builds the `TelegramClient` from the session path and API
   credentials. A user session on the manager's account, not a bot.
+  `clone_session` snapshots a session file through the SQLite backup API, so a
+  second process can use the account without touching the original.
 - `login.py` — `TelegramLogin`, run through `make login`. Asks for the phone
   number and the login code, and for the two-step verification password when the
   account has it enabled. Writes the session file and exits. Run it once per

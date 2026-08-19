@@ -13,7 +13,8 @@ Logging goes to stdout at `INFO`. Captures, status changes, rejected replies and
 unresolved assignees are logged; every failure inside a Telegram handler is
 logged with its traceback and never stops the listener.
 
-`digest.py` opens the same Telethon session file as a running `main.py`, so
-while the service is up two processes hold one session.
+`digest.py` runs against a throwaway copy of the Telethon session. Sharing the
+file with a running `main.py` locks it, and writing to it would overwrite the
+listener's update state and make it miss messages.
 
 Subpackages: `core`, `db`, `models`, `services`, `telegram`, `api`.
