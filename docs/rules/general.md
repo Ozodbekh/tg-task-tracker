@@ -25,6 +25,12 @@ These rules apply to every part of the project, backend and frontend alike.
 - Do not write comments in code. The code must explain itself through naming
   and structure.
 
+## Git
+
+- Commit to `main`. Do not create a branch unless one is asked for by name —
+  the server deploys from `main`.
+- Commit only when it is asked for.
+
 ## Language
 
 - All `.md` files are written in English.
