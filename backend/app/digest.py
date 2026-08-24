@@ -18,6 +18,7 @@ LOG_FORMAT = "%(asctime)s %(levelname)-8s %(name)s %(message)s"
 async def run() -> None:
     logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
     logging.getLogger("telethon").setLevel(logging.WARNING)
+    logger.info("Digest run started")
 
     database = Database(settings.db_path)
     await database.connect()
