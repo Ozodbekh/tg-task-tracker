@@ -22,7 +22,9 @@ Business logic. The only caller of `db/`.
 - `digest.py` — `DigestService.weekly` counts each employee's tasks for the
   current week. The week starts Monday at midnight in the configured timezone
   and the window runs a full seven days, so it never cuts a task off at `now`.
-  Employees with no task in the week are absent from the result.
+  Employees with no task in the week are absent from the result, and so are
+  those whose every task is already `done` — there is nothing to remind them
+  of.
 - `views.py` — row-to-model mapping and the shared `completion_rate` formula.
 
 Notes:

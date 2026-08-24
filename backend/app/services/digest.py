@@ -1,6 +1,8 @@
 from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo
 
+import aiosqlite
+
 from app.db.stats import StatsRepository
 from app.models.digest import EmployeeDigest
 from app.models.filters import DateRange
@@ -17,14 +19,19 @@ class DigestService:
     async def weekly(self) -> list[EmployeeDigest]:
         rows = await self._repository.digest(self.current_week())
         return [
-            EmployeeDigest(
-                telegram_id=row["telegram_id"],
-                name=row["name"],
-                total=int(row["total"]),
-                by_status=to_counts(row),
-            )
-            for row in rows
+            digest
+            for digest in (self._to_digest(row) for row in rows)
+            if digest.by_status.done < digest.total
         ]
+
+    @staticmethod
+    def _to_digest(row: aiosqlite.Row) -> EmployeeDigest:
+        return EmployeeDigest(
+            telegram_id=row["telegram_id"],
+            name=row["name"],
+            total=int(row["total"]),
+            by_status=to_counts(row),
+        )
 
     def current_week(self) -> DateRange:
         now = datetime.now(UTC).astimezone(self._zone)

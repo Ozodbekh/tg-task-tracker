@@ -79,6 +79,35 @@ async def test_weekly_counts_every_status(
     assert row.by_status.cancelled == 1
 
 
+async def test_employee_with_everything_done_is_skipped(
+    digests: DigestService,
+    tasks: TaskService,
+    group: ChatIdentity,
+    assignee: EmployeeIdentity,
+) -> None:
+    for message_id in (10, 11):
+        await capture(tasks, group, assignee, message_id)
+        await move(tasks, group, assignee, message_id, TaskStatus.DONE)
+
+    assert await digests.weekly() == []
+
+
+async def test_one_task_left_open_still_earns_a_reminder(
+    digests: DigestService,
+    tasks: TaskService,
+    group: ChatIdentity,
+    assignee: EmployeeIdentity,
+) -> None:
+    for message_id in (10, 11):
+        await capture(tasks, group, assignee, message_id)
+    await move(tasks, group, assignee, 10, TaskStatus.DONE)
+
+    rows = await digests.weekly()
+    assert [row.telegram_id for row in rows] == [assignee.telegram_id]
+    assert rows[0].by_status.done == 1
+    assert rows[0].by_status.open == 1
+
+
 async def test_employee_without_tasks_is_skipped(
     digests: DigestService,
     tasks: TaskService,
