@@ -22,6 +22,8 @@ rules.
   `MessageEdited`.
 - `digest.py` — `DigestSender` renders the Uzbek weekly summary and sends it to
   each employee's private chat. A failed send is logged and the run continues.
+  The message is HTML: the header and every count are bold, so the employee name
+  is escaped before it goes into the template.
 
 Notes:
 

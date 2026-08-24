@@ -116,12 +116,24 @@ async def test_rendered_message_carries_every_line(
 
     message = DigestSender.render((await digests.weekly())[0])
 
-    assert message.startswith("Bugungi statistika:")
-    assert f"{assignee.name}, sizda bu hafta 2 ta task yaratildi" in message
-    assert "Shundan 0 ta task ish jarayonida" in message
-    assert "1 ta task to'liq bajarildi" in message
-    assert "0 ta task hozircha to'xtatildi" in message
-    assert "0 ta task sizga bog'liq emas holda to'xtab qolgan" in message
-    assert "0 ta task bekor qilindi, bajarish shart emas" in message
-    assert "1 ta task hali qarab ham ko'rmadingiz" in message
+    assert message.startswith("<b>📌📌 Avtomatik eslatma 📌📌</b>\nBugungi statistika:")
+    assert f"{assignee.name}, sizda bu hafta <b>2</b> ta task yaratildi" in message
+    assert "Shundan <b>0</b> ta task ish jarayonida" in message
+    assert "<b>1</b> ta task to'liq bajarildi" in message
+    assert "<b>0</b> ta task hozircha to'xtatildi" in message
+    assert "<b>0</b> ta task sizga bog'liq emas holda to'xtab qolgan" in message
+    assert "<b>0</b> ta task bekor qilindi, bajarish shart emas" in message
+    assert "<b>1</b> ta task hali qarab ham ko'rmadingiz" in message
     assert message.endswith("@tg_task_tracker yozing!")
+
+
+async def test_rendered_name_is_escaped(
+    digests: DigestService,
+    tasks: TaskService,
+    group: ChatIdentity,
+) -> None:
+    await capture(tasks, group, EmployeeIdentity(telegram_id=777, name="Ali <b>&"), 10)
+
+    message = DigestSender.render((await digests.weekly())[0])
+
+    assert "Ali &lt;b&gt;&amp;, sizda bu hafta <b>1</b> ta task yaratildi" in message
