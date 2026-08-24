@@ -1,5 +1,7 @@
+import asyncio
 import logging
 from html import escape
+from random import uniform
 
 from telethon import TelegramClient
 
@@ -22,6 +24,9 @@ Sizda tizimni yaxshilash bo'yicha taklif bo'lsa @tg_task_tracker yozing!"""
 
 PARSE_MODE = "html"
 
+MIN_PAUSE_SECONDS = 4.0
+MAX_PAUSE_SECONDS = 12.0
+
 UNTRACKED = 0
 
 
@@ -31,7 +36,9 @@ class DigestSender:
 
     async def send(self, digests: list[EmployeeDigest]) -> int:
         delivered = 0
-        for digest in digests:
+        for position, digest in enumerate(digests):
+            if position:
+                await asyncio.sleep(uniform(MIN_PAUSE_SECONDS, MAX_PAUSE_SECONDS))
             if await self._send_one(digest):
                 delivered += 1
         return delivered

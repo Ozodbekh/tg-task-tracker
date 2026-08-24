@@ -17,6 +17,8 @@ Mirrors the `app/` package layout.
   message links, task history, `404`s and rejected filters.
 - `telegram/test_tags.py` — tag matching.
 - `telegram/test_client.py` — session cloning while the file is held open.
+- `telegram/test_digest.py` — send pacing, with `asyncio.sleep` recorded
+  instead of awaited.
 
 `asyncio_mode = "auto"`, so async tests need no marker. The Telethon layer is
 not covered; it holds no business rules.
