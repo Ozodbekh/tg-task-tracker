@@ -6,8 +6,8 @@ The backend application package.
   services and the Telegram client together, then runs the client until it
   disconnects. It refuses to start without an authorized session.
 - `digest.py` — one-shot entry point behind `make digest`: wires the database
-  and the Telegram client, sends every employee their current-week summary,
-  then exits. It refuses to run without an authorized session.
+  and the Telegram client, sends every employee with unfinished work their
+  task summary, then exits. It refuses to run without an authorized session.
 
 Logging goes to stdout at `INFO`. Captures, status changes, rejected replies and
 unresolved assignees are logged; every failure inside a Telegram handler is

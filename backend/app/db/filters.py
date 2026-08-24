@@ -19,11 +19,6 @@ def _range_conditions(column: str, window: DateRange) -> tuple[list[str], list[o
     return conditions, parameters
 
 
-def range_clause(column: str, window: DateRange) -> FilterClause:
-    conditions, parameters = _range_conditions(column, window)
-    return FilterClause(" AND ".join(conditions), parameters)
-
-
 def task_clause(filters: TaskFilters, window: DateRange) -> FilterClause:
     conditions, parameters = _range_conditions("t.created_at", window)
 

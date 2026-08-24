@@ -7,7 +7,6 @@ from app.db.filters import (
     TASK_SOURCE,
     UNRESOLVED_SOURCE,
     FilterClause,
-    range_clause,
     task_clause,
     unresolved_clause,
 )
@@ -170,16 +169,14 @@ class StatsRepository:
         rows = await self._fetch_all(sql, clause.parameters)
         return {row["chat_id"]: int(row["total"]) for row in rows}
 
-    async def digest(self, window: DateRange) -> list[aiosqlite.Row]:
-        clause = range_clause("t.created_at", window)
+    async def digest(self) -> list[aiosqlite.Row]:
         sql = f"""
             SELECT e.telegram_id, e.name, {COUNT_COLUMNS}
             FROM {DIGEST_SOURCE}
-            WHERE {clause.sql}
             GROUP BY e.id
             ORDER BY e.name
         """
-        return await self._fetch_all(sql, clause.parameters)
+        return await self._fetch_all(sql, [])
 
     async def _fetch_one(self, sql: str, parameters: list[object]) -> aiosqlite.Row:
         async with self._database.cursor() as cursor:

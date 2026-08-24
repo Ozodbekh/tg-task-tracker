@@ -32,8 +32,8 @@ async def run() -> None:
             if not await client.is_user_authorized():
                 raise RuntimeError("No authorized session. Run `make login` first.")
 
-            service = DigestService(StatsRepository(database), settings.timezone)
-            digests = await service.weekly()
+            service = DigestService(StatsRepository(database))
+            digests = await service.pending()
             delivered = await DigestSender(client).send(digests)
             logger.info(
                 "Digest delivered to %s of %s employees", delivered, len(digests)

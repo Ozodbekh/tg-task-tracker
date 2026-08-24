@@ -19,7 +19,7 @@ seed: ## Fill the database with fake rows for UI testing
 run: ## Run the Telegram listener
 	uv run python -m app.main
 
-digest: ## Send the weekly digest to every employee with a task this week
+digest: ## Send the digest to every employee with an unfinished task
 	uv run python -m app.digest
 
 test: ## Run the test suite

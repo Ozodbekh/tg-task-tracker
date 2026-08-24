@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 TEMPLATE = """<b>📌📌 Avtomatik eslatma 📌📌</b>
 Bugungi statistika:
 
-{name}, sizda bu hafta <b>{total}</b> ta task yaratildi
+{name}, sizda jami <b>{total}</b> ta task bor
 Shundan <b>{in_progress}</b> ta task ish jarayonida
 <b>{done}</b> ta task to'liq bajarildi
 <b>{paused}</b> ta task hozircha to'xtatildi

@@ -20,7 +20,7 @@ rules.
   message's sender.
 - `handlers.py` — `TaskEventHandler` subscribes to `NewMessage` and
   `MessageEdited`.
-- `digest.py` — `DigestSender` renders the Uzbek weekly summary and sends it to
+- `digest.py` — `DigestSender` renders the Uzbek task summary and sends it to
   each employee's private chat. Messages go out one at a time with a random
   pause between them, so a large run does not read as a bot. A failed send is
   logged and the run continues.

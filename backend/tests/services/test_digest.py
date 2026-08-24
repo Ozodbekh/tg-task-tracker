@@ -15,7 +15,7 @@ MANAGER_ID = 1
 
 @pytest.fixture
 def digests(database: Database) -> DigestService:
-    return DigestService(StatsRepository(database), "Asia/Tashkent")
+    return DigestService(StatsRepository(database))
 
 
 async def capture(
@@ -54,7 +54,15 @@ async def move(
     )
 
 
-async def test_weekly_counts_every_status(
+async def backdate(database: Database, message_id: int, moment: str) -> None:
+    async with database.cursor() as cursor:
+        await cursor.execute(
+            "UPDATE tasks SET created_at = ? WHERE message_id = ?",
+            (moment, message_id),
+        )
+
+
+async def test_counts_every_status(
     digests: DigestService,
     tasks: TaskService,
     group: ChatIdentity,
@@ -66,7 +74,7 @@ async def test_weekly_counts_every_status(
     await move(tasks, group, assignee, 12, TaskStatus.DONE)
     await tasks.cancel(group, 13, MANAGER_ID)
 
-    rows = await digests.weekly()
+    rows = await digests.pending()
     assert len(rows) == 1
 
     row = rows[0]
@@ -79,6 +87,21 @@ async def test_weekly_counts_every_status(
     assert row.by_status.cancelled == 1
 
 
+async def test_an_old_task_still_counts(
+    digests: DigestService,
+    database: Database,
+    tasks: TaskService,
+    group: ChatIdentity,
+    assignee: EmployeeIdentity,
+) -> None:
+    await capture(tasks, group, assignee, 10)
+    await backdate(database, 10, "2024-01-15T09:00:00+00:00")
+
+    rows = await digests.pending()
+    assert [row.total for row in rows] == [1]
+    assert rows[0].by_status.open == 1
+
+
 async def test_employee_with_everything_done_is_skipped(
     digests: DigestService,
     tasks: TaskService,
@@ -89,7 +112,7 @@ async def test_employee_with_everything_done_is_skipped(
         await capture(tasks, group, assignee, message_id)
         await move(tasks, group, assignee, message_id, TaskStatus.DONE)
 
-    assert await digests.weekly() == []
+    assert await digests.pending() == []
 
 
 async def test_one_task_left_open_still_earns_a_reminder(
@@ -102,7 +125,7 @@ async def test_one_task_left_open_still_earns_a_reminder(
         await capture(tasks, group, assignee, message_id)
     await move(tasks, group, assignee, 10, TaskStatus.DONE)
 
-    rows = await digests.weekly()
+    rows = await digests.pending()
     assert [row.telegram_id for row in rows] == [assignee.telegram_id]
     assert rows[0].by_status.done == 1
     assert rows[0].by_status.open == 1
@@ -118,19 +141,8 @@ async def test_employee_without_tasks_is_skipped(
     await capture(tasks, group, assignee, 10)
     await employees.ensure(EmployeeIdentity(telegram_id=888, name="Bek"))
 
-    rows = await digests.weekly()
+    rows = await digests.pending()
     assert [row.telegram_id for row in rows] == [assignee.telegram_id]
-
-
-async def test_week_starts_on_monday_in_the_configured_timezone(
-    digests: DigestService,
-) -> None:
-    window = digests.current_week()
-    assert window.start is not None
-    assert window.start.weekday() == 0
-    assert (window.start.hour, window.start.minute, window.start.second) == (0, 0, 0)
-    assert window.start.utcoffset() is not None
-    assert (window.end - window.start).days == 7
 
 
 async def test_rendered_message_carries_every_line(
@@ -143,10 +155,11 @@ async def test_rendered_message_carries_every_line(
         await capture(tasks, group, assignee, message_id)
     await move(tasks, group, assignee, 11, TaskStatus.DONE)
 
-    message = DigestSender.render((await digests.weekly())[0])
+    message = DigestSender.render((await digests.pending())[0])
 
-    assert message.startswith("<b>📌📌 Avtomatik eslatma 📌📌</b>\nBugungi statistika:")
-    assert f"{assignee.name}, sizda bu hafta <b>2</b> ta task yaratildi" in message
+    assert message.startswith("<b>📌📌 Avtomatik eslatma 📌📌</b>")
+    assert "Bugungi statistika:" in message
+    assert f"{assignee.name}, sizda jami <b>2</b> ta task bor" in message
     assert "Shundan <b>0</b> ta task ish jarayonida" in message
     assert "<b>1</b> ta task to'liq bajarildi" in message
     assert "<b>0</b> ta task hozircha to'xtatildi" in message
@@ -161,8 +174,10 @@ async def test_rendered_name_is_escaped(
     tasks: TaskService,
     group: ChatIdentity,
 ) -> None:
-    await capture(tasks, group, EmployeeIdentity(telegram_id=777, name="Ali <b>&"), 10)
+    await capture(
+        tasks, group, EmployeeIdentity(telegram_id=42, name="A & <b>B</b>"), 10
+    )
 
-    message = DigestSender.render((await digests.weekly())[0])
+    message = DigestSender.render((await digests.pending())[0])
 
-    assert "Ali &lt;b&gt;&amp;, sizda bu hafta <b>1</b> ta task yaratildi" in message
+    assert "A &amp; &lt;b&gt;B&lt;/b&gt;" in message
