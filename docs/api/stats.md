@@ -10,7 +10,10 @@ Headline numbers.
 ```json
 {
   "total": 0,
-  "by_status": { "open": 0, "in_progress": 0, "done": 0, "cancelled": 0 },
+  "by_status": {
+    "open": 0, "in_progress": 0, "on_hold": 0, "blocked": 0,
+    "done": 0, "cancelled": 0
+  },
   "completion_rate": 0.0,
   "avg_completion_seconds": null,
   "avg_response_seconds": null,
@@ -38,7 +41,8 @@ One point per bucket, ascending, empty buckets included.
 ```
 
 `created` counts tasks created in the bucket; the other three count tasks whose
-current status is that value, keyed by the same `created_at` bucket.
+current status is that value, keyed by the same `created_at` bucket. The series
+carries no `on_hold` or `blocked` figure.
 
 ## GET /api/stats/employees
 

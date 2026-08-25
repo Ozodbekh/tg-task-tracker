@@ -70,6 +70,8 @@ def to_counts(row: aiosqlite.Row) -> StatusCounts:
     return StatusCounts(
         open=row["open"],
         in_progress=row["in_progress"],
+        on_hold=row["on_hold"],
+        blocked=row["blocked"],
         done=row["done"],
         cancelled=row["cancelled"],
     )

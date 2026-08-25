@@ -29,9 +29,11 @@ TASK_TEXTS = [
 ]
 
 STATUS_WEIGHTS = [
-    (TaskStatus.DONE, 55),
-    (TaskStatus.OPEN, 20),
-    (TaskStatus.IN_PROGRESS, 18),
+    (TaskStatus.DONE, 48),
+    (TaskStatus.OPEN, 18),
+    (TaskStatus.IN_PROGRESS, 15),
+    (TaskStatus.ON_HOLD, 7),
+    (TaskStatus.BLOCKED, 5),
     (TaskStatus.CANCELLED, 7),
 ]
 
@@ -172,6 +174,15 @@ class Seeder:
                 if cancelled:
                     await self._insert_event(
                         cursor, task_id, TaskStatus.CANCELLED, 1, message_id, cancelled
+                    )
+                if status in (TaskStatus.ON_HOLD, TaskStatus.BLOCKED):
+                    await self._insert_event(
+                        cursor,
+                        task_id,
+                        status,
+                        telegram_id,
+                        message_id,
+                        created + timedelta(hours=self._random.uniform(1, 72)),
                     )
 
     async def _insert_unresolved(self, chats: list[tuple[int, str]]) -> None:

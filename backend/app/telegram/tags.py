@@ -5,7 +5,10 @@ from app.models.task import TaskStatus
 TASK_TAG = "task"
 STATUS_TAGS: dict[str, TaskStatus] = {
     "inp": TaskStatus.IN_PROGRESS,
+    "onhold": TaskStatus.ON_HOLD,
+    "blocked": TaskStatus.BLOCKED,
     "done": TaskStatus.DONE,
+    "cancel": TaskStatus.CANCELLED,
 }
 
 _TAG_PATTERN = re.compile(r"(?<!\w)#(\w+)")
@@ -13,8 +16,8 @@ _TAG_PATTERN = re.compile(r"(?<!\w)#(\w+)")
 
 class TagReader:
     @staticmethod
-    def tags(text: str) -> set[str]:
-        return {match.lower() for match in _TAG_PATTERN.findall(text)}
+    def tags(text: str) -> list[str]:
+        return [match.lower() for match in _TAG_PATTERN.findall(text)]
 
     @classmethod
     def has_task_tag(cls, text: str) -> bool:

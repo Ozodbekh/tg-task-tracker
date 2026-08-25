@@ -145,6 +145,26 @@ async def test_employee_without_tasks_is_skipped(
     assert [row.telegram_id for row in rows] == [assignee.telegram_id]
 
 
+async def test_on_hold_and_blocked_reach_the_message(
+    digests: DigestService,
+    tasks: TaskService,
+    group: ChatIdentity,
+    assignee: EmployeeIdentity,
+) -> None:
+    for message_id in (10, 11, 12):
+        await capture(tasks, group, assignee, message_id)
+    await move(tasks, group, assignee, 10, TaskStatus.ON_HOLD)
+    await move(tasks, group, assignee, 11, TaskStatus.BLOCKED)
+
+    row = (await digests.pending())[0]
+    assert row.by_status.on_hold == 1
+    assert row.by_status.blocked == 1
+
+    message = DigestSender.render(row)
+    assert "<b>1</b> ta task hozircha to'xtatildi" in message
+    assert "<b>1</b> ta task sizga bog'liq emas holda to'xtab qolgan" in message
+
+
 async def test_rendered_message_carries_every_line(
     digests: DigestService,
     tasks: TaskService,

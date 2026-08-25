@@ -46,7 +46,13 @@ This is what lets the web panel link back to the original message.
 - A task starts as `open`.
 - The assignee replies to the task message to change its status:
   - `#inp` moves it to `in_progress`
+  - `#onhold` moves it to `on_hold`, paused by the assignee
+  - `#blocked` moves it to `blocked`, waiting on someone else
   - `#done` moves it to `done`
+  - `#cancel` moves it to `cancelled`
+- A message carrying more than one status tag takes the first one in the text.
+- Only `in_progress`, `done` and `cancelled` stamp a column on the task row.
+  `on_hold` and `blocked` are recorded as events only.
 - Works in one-to-one chats and groups.
 - A status reply is accepted only from the task's assignee. Replies from anyone
   else are ignored.

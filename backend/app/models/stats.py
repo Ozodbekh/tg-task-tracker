@@ -9,6 +9,8 @@ from app.models.employee import Employee
 class StatusCounts(BaseModel):
     open: int = 0
     in_progress: int = 0
+    on_hold: int = 0
+    blocked: int = 0
     done: int = 0
     cancelled: int = 0
 

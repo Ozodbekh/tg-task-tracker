@@ -27,8 +27,6 @@ PARSE_MODE = "html"
 MIN_PAUSE_SECONDS = 4.0
 MAX_PAUSE_SECONDS = 12.0
 
-UNTRACKED = 0
-
 
 class DigestSender:
     def __init__(self, client: TelegramClient) -> None:
@@ -65,8 +63,8 @@ class DigestSender:
             total=digest.total,
             in_progress=digest.by_status.in_progress,
             done=digest.by_status.done,
-            paused=UNTRACKED,
-            blocked=UNTRACKED,
+            paused=digest.by_status.on_hold,
+            blocked=digest.by_status.blocked,
             cancelled=digest.by_status.cancelled,
             open=digest.by_status.open,
         )

@@ -10,6 +10,8 @@ from app.models.employee import Employee, EmployeeIdentity
 class TaskStatus(StrEnum):
     OPEN = "open"
     IN_PROGRESS = "in_progress"
+    ON_HOLD = "on_hold"
+    BLOCKED = "blocked"
     DONE = "done"
     CANCELLED = "cancelled"
 

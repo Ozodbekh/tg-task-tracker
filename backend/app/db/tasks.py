@@ -35,6 +35,8 @@ SORT_COLUMNS: dict[str, str] = {
 STATUS_TIMESTAMP_COLUMN: dict[TaskStatus, str | None] = {
     TaskStatus.OPEN: None,
     TaskStatus.IN_PROGRESS: "started_at",
+    TaskStatus.ON_HOLD: None,
+    TaskStatus.BLOCKED: None,
     TaskStatus.DONE: "done_at",
     TaskStatus.CANCELLED: "cancelled_at",
 }

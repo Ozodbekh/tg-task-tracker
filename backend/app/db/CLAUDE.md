@@ -24,7 +24,9 @@ Notes:
 - A task is unique by `(chat_id, message_id)`. Re-capturing an existing message
   updates it and revives it from `cancelled` back to `open`; it never resets a
   live status.
-- Status timestamps are written through `STATUS_TIMESTAMP_COLUMN`.
+- Status timestamps are written through `STATUS_TIMESTAMP_COLUMN`. `on_hold` and
+  `blocked` map to no column, so they need no schema change; `task_events` keeps
+  when they happened.
 - Timestamps are stored as ISO 8601 text and compared with `datetime()` so the
   stored offset is honored.
 - `make seed` is destructive; never run it against a real database.

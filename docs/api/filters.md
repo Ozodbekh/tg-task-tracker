@@ -10,7 +10,7 @@ Shared query parameters. Every endpoint under [stats](stats.md), plus
 - `bucket` — `hour`, `day`, `week`, `month`. Only `/api/stats/timeseries` reads
   it. Defaults: `day → hour`, `week`/`month` → `day`, `quarter → week`,
   `9months`/`year`/`all` → `month`.
-- `status` — `open`, `in_progress`, `done`, `cancelled`.
+- `status` — `open`, `in_progress`, `on_hold`, `blocked`, `done`, `cancelled`.
 - `chat_id` — internal `chats.id`.
 - `chat_type` — `private` or `group`.
 - `employee_id` — internal `employees.id`.
@@ -50,9 +50,11 @@ Errors: `400` with `{ "detail": "Invalid filters" }` for an unknown `period`,
 - `employee` — `{ id, telegram_id, name, created_at }`.
 - `chat` — `{ id, telegram_id, type, title, created_at }`. `title` is `null` for
   private chats.
-- `by_status` — `{ open, in_progress, done, cancelled }`, integers.
+- `by_status` — `{ open, in_progress, on_hold, blocked, done, cancelled }`,
+  integers.
 - `completion_rate` — float `0..1`: `done / (total - cancelled)`, `0` when the
-  denominator is `0`.
+  denominator is `0`. `on_hold` and `blocked` stay in the denominator; they are
+  unfinished work.
 - `avg_completion_seconds` — float, `done_at - created_at` averaged over done
   tasks; `null` when there are none.
 - `avg_response_seconds` — float, `started_at - created_at` averaged over

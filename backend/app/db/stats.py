@@ -21,6 +21,8 @@ COUNT_COLUMNS = """
     COUNT(*) AS total,
     COALESCE(SUM(t.status = 'open'), 0) AS open,
     COALESCE(SUM(t.status = 'in_progress'), 0) AS in_progress,
+    COALESCE(SUM(t.status = 'on_hold'), 0) AS on_hold,
+    COALESCE(SUM(t.status = 'blocked'), 0) AS blocked,
     COALESCE(SUM(t.status = 'done'), 0) AS done,
     COALESCE(SUM(t.status = 'cancelled'), 0) AS cancelled
 """

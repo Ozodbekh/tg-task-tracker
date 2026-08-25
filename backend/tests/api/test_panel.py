@@ -29,7 +29,14 @@ async def test_overview(signed_in: httpx.AsyncClient) -> None:
     assert body["total"] == sum(counts.values())
     assert 0.0 <= body["completion_rate"] <= 1.0
     assert body["previous"] is not None
-    assert set(counts) == {"open", "in_progress", "done", "cancelled"}
+    assert set(counts) == {
+        "open",
+        "in_progress",
+        "on_hold",
+        "blocked",
+        "done",
+        "cancelled",
+    }
 
 
 async def test_overview_for_all_has_no_previous_window(

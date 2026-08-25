@@ -12,8 +12,10 @@ rules.
   account has it enabled. Writes the session file and exits. Run it once per
   server before starting the app; `main.py` refuses to start without an
   authorized session instead of prompting.
-- `tags.py` — `TagReader` reads hashtags: `#task` marks a task, `#inp` and
-  `#done` are status tags. Matching is case-insensitive and whole-tag.
+- `tags.py` — `TagReader` reads hashtags: `#task` marks a task; `#inp`,
+  `#onhold`, `#blocked`, `#done` and `#cancel` are status tags. Matching is
+  case-insensitive and whole-tag. `tags` keeps the order they appear in, so a
+  message with two status tags resolves to the first one, not an arbitrary one.
 - `parser.py` — `MessageParser` resolves the chat and the assignee. In a private
   chat the assignee is the other party. In a group it tries, in order: a text
   mention carrying a `user_id`, an `@username` mention, then the replied-to
@@ -32,5 +34,6 @@ Notes:
 - Only outgoing messages create tasks; incoming ones can only carry status tags.
 - On edit, an outgoing message that lost its `#task` tag cancels the task.
 - A `#task` message with no resolvable assignee is recorded as unresolved.
-- The digest reports two counts the system does not track yet, paused and
-  externally blocked; both are always `0`.
+- `#cancel` from the assignee and a `#task` tag removed by an edit both land on
+  `cancelled`; the edit path stores no comment, the reply path stores the text
+  sent with the tag.
