@@ -22,6 +22,8 @@ export const PERIODS: { value: Period; label: string; short: string }[] = [
 export const STATUSES: { value: TaskStatus; label: string }[] = [
   { value: "open", label: "Ochiq" },
   { value: "in_progress", label: "Jarayonda" },
+  { value: "on_hold", label: "To'xtatib turilgan" },
+  { value: "blocked", label: "Bloklangan" },
   { value: "done", label: "Bajarilgan" },
   { value: "cancelled", label: "Bekor qilingan" },
 ];

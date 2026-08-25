@@ -1,4 +1,4 @@
-export type TaskStatus = "open" | "in_progress" | "done" | "cancelled";
+export type TaskStatus = "open" | "in_progress" | "on_hold" | "blocked" | "done" | "cancelled";
 
 export type ChatType = "private" | "group";
 
@@ -60,6 +60,8 @@ export interface UnresolvedMessage {
 export interface StatusCounts {
   open: number;
   in_progress: number;
+  on_hold: number;
+  blocked: number;
   done: number;
   cancelled: number;
 }

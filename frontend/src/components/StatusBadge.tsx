@@ -1,9 +1,20 @@
 import { statusLabel } from "@/lib/filters";
 import type { TaskStatus } from "@/types/domain";
 
+export const STATUS_ORDER: TaskStatus[] = [
+  "done",
+  "in_progress",
+  "on_hold",
+  "blocked",
+  "open",
+  "cancelled",
+];
+
 export const STATUS_COLOR: Record<TaskStatus, string> = {
   open: "var(--open)",
   in_progress: "var(--progress)",
+  on_hold: "var(--hold)",
+  blocked: "var(--blocked)",
   done: "var(--done)",
   cancelled: "var(--cancelled)",
 };

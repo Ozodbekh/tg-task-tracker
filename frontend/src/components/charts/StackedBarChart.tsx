@@ -9,12 +9,10 @@ import {
   YAxis,
 } from "recharts";
 
-import { STATUS_COLOR } from "@/components/StatusBadge";
+import { STATUS_COLOR, STATUS_ORDER } from "@/components/StatusBadge";
 import { useBreakpoints } from "@/hooks/useMediaQuery";
 import { statusLabel } from "@/lib/filters";
-import type { StatusCounts, TaskStatus } from "@/types/domain";
-
-const ORDER: TaskStatus[] = ["done", "in_progress", "open", "cancelled"];
+import type { StatusCounts } from "@/types/domain";
 
 export interface StackedRow extends StatusCounts {
   name: string;
@@ -46,7 +44,7 @@ export function StackedBarChart({ data, height = 320 }: { data: StackedRow[]; he
           }}
         />
         <Legend iconType="circle" wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
-        {ORDER.map((status) => (
+        {STATUS_ORDER.map((status) => (
           <Bar
             key={status}
             dataKey={status}

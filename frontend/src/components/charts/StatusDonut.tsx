@@ -1,16 +1,14 @@
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
-import { STATUS_COLOR } from "@/components/StatusBadge";
+import { STATUS_COLOR, STATUS_ORDER } from "@/components/StatusBadge";
 import { useBreakpoints } from "@/hooks/useMediaQuery";
 import { statusLabel } from "@/lib/filters";
 import { formatNumber } from "@/lib/format";
-import type { StatusCounts, TaskStatus } from "@/types/domain";
-
-const ORDER: TaskStatus[] = ["done", "in_progress", "open", "cancelled"];
+import type { StatusCounts } from "@/types/domain";
 
 export function StatusDonut({ counts }: { counts: StatusCounts }) {
   const { mobile } = useBreakpoints();
-  const data = ORDER.map((status) => ({
+  const data = STATUS_ORDER.map((status) => ({
     name: statusLabel(status),
     value: counts[status],
     color: STATUS_COLOR[status],

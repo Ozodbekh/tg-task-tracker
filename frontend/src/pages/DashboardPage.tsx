@@ -113,11 +113,7 @@ export function DashboardPage() {
         )}
 
         <div className="grid grid-2">
-          <Card
-            title="Topshiriqlar dinamikasi"
-            hint="Berilgan va bajarilgan topshiriqlar"
-            actions={<StatusLegend />}
-          >
+          <Card title="Topshiriqlar dinamikasi" hint="Berilgan va bajarilgan topshiriqlar">
             {timeseries.loading && !timeseries.data ? (
               <Skeleton height={280} />
             ) : timeseries.data?.length ? (
