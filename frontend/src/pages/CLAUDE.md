@@ -9,7 +9,8 @@ One file per route. Pages fetch through `api/resources` and render components.
 - `TasksPage.tsx` — filtered, searchable, paginated task list; a row opens
   `TaskDrawer`.
 - `EmployeesPage.tsx` — per-employee performance table, paginated.
-- `EmployeeDetailPage.tsx` — one employee: KPIs, trend, chats, recent tasks.
+- `EmployeeDetailPage.tsx` — one employee: KPIs, trend, chats, and that
+  employee's paginated task list.
 - `ChatsPage.tsx` — chats and groups as task sources, paginated; a row sets the
   chat filter.
 - `UnresolvedPage.tsx` — `#task` messages with no resolved assignee, paginated.

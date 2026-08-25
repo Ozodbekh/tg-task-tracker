@@ -4,6 +4,7 @@ import { backend } from "@/api/resources";
 import { Card } from "@/components/Card";
 import { FilterBar } from "@/components/FilterBar";
 import { PageHeader } from "@/components/Layout";
+import { Pagination } from "@/components/Pagination";
 import { StatCard } from "@/components/StatCard";
 import { StateBlock, Skeleton } from "@/components/StateBlock";
 import { StatusBadge } from "@/components/StatusBadge";
@@ -11,6 +12,7 @@ import { StackedBarChart } from "@/components/charts/StackedBarChart";
 import { StatusDonut } from "@/components/charts/StatusDonut";
 import { TasksTrendChart } from "@/components/charts/TasksTrendChart";
 import { useFilters } from "@/hooks/FiltersContext";
+import { usePagination } from "@/hooks/usePagination";
 import { useResource } from "@/hooks/useResource";
 import { bucketFor, periodLabel } from "@/lib/filters";
 import {
@@ -32,7 +34,12 @@ export function EmployeeDetailPage() {
   const stats = useResource(() => backend.employee(employeeId, scoped), [key]);
   const timeseries = useResource(() => backend.timeseries(scoped), [key]);
   const chats = useResource(() => backend.chatStats({ ...scoped, page: 1, page_size: 8 }), [key]);
-  const tasks = useResource(() => backend.tasks({ ...scoped, page: 1, page_size: 10 }), [key]);
+
+  const { page, pageSize, setPage, setPageSize } = usePagination(key);
+  const tasks = useResource(
+    () => backend.tasks({ ...scoped, page, page_size: pageSize }),
+    [JSON.stringify({ scoped, page, pageSize })],
+  );
 
   const data = stats.data;
 
@@ -115,37 +122,56 @@ export function EmployeeDetailPage() {
           )}
         </Card>
 
-        <Card title="So'nggi topshiriqlar" padded={false}>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Topshiriq</th>
-                  <th>Chat</th>
-                  <th>Status</th>
-                  <th>Berilgan</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tasks.data?.items.map((task) => (
-                  <tr key={task.id}>
-                    <td>
-                      <span className="cell-title">{task.text}</span>
-                    </td>
-                    <td className="muted" data-label="Chat">
-                      {chatName(task.chat.title, `Chat ${task.chat.telegram_id}`)}
-                    </td>
-                    <td data-label="Status">
-                      <StatusBadge status={task.status} />
-                    </td>
-                    <td className="muted numeric" data-label="Berilgan">
-                      {formatDateTime(task.created_at)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <Card title="Topshiriqlar" padded={false}>
+          {tasks.error ? (
+            <StateBlock title="Yuklab bo'lmadi" description={tasks.error} onRetry={tasks.reload} />
+          ) : tasks.loading && !tasks.data ? (
+            <div style={{ padding: 18 }}>
+              <Skeleton height={280} />
+            </div>
+          ) : tasks.data?.items.length ? (
+            <>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Topshiriq</th>
+                      <th>Chat</th>
+                      <th>Status</th>
+                      <th>Berilgan</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tasks.data.items.map((task) => (
+                      <tr key={task.id}>
+                        <td>
+                          <span className="cell-title">{task.text}</span>
+                        </td>
+                        <td className="muted" data-label="Chat">
+                          {chatName(task.chat.title, `Chat ${task.chat.telegram_id}`)}
+                        </td>
+                        <td data-label="Status">
+                          <StatusBadge status={task.status} />
+                        </td>
+                        <td className="muted numeric" data-label="Berilgan">
+                          {formatDateTime(task.created_at)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <Pagination
+                page={page}
+                pageSize={pageSize}
+                total={tasks.data.total}
+                onPage={setPage}
+                onPageSize={setPageSize}
+              />
+            </>
+          ) : (
+            <StateBlock title="Topshiriq topilmadi" description="Filtrlarni o'zgartirib ko'ring" />
+          )}
         </Card>
       </div>
     </>
