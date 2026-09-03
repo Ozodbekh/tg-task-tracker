@@ -19,6 +19,7 @@ backend/app/
   models/     Pydantic models
   services/   business logic
   telegram/   Telethon client, message parsing, event handlers
+  bot/        Telegram bot: commands employees run, and its PDF report
 backend/tests/
 ```
 
@@ -28,6 +29,8 @@ backend/tests/
   logic, no SQL.
 - `telegram/` turns Telegram updates into service calls. It resolves Telegram
   concepts into plain data and holds no business rules.
+- `bot/` answers employee commands. Same rule: it calls services and renders,
+  it decides nothing.
 - `services/` owns the business logic and is the only caller of `db/`.
 - `db/` owns SQL and the connection. It returns data, never HTTP concepts.
 - Dependencies point inward. A lower layer never imports a higher one.

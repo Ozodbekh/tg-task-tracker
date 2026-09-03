@@ -3,8 +3,9 @@
 The backend application package.
 
 - `main.py` — configures logging, wires settings, database, repositories,
-  services and the Telegram client together, then runs the client until it
-  disconnects. It refuses to start without an authorized session.
+  services, the Telegram client and the bot together, then runs the client
+  until it disconnects. It refuses to start without an authorized session, and
+  skips the bot when `BOT_TOKEN` is empty.
 - `digest.py` — one-shot entry point behind `make digest`: wires the database
   and the Telegram client, sends every employee with unfinished work their
   task summary, then exits. It refuses to run without an authorized session.
@@ -20,4 +21,4 @@ logged with its traceback and never stops the listener.
 file with a running `main.py` locks it, and writing to it would overwrite the
 listener's update state and make it miss messages.
 
-Subpackages: `core`, `db`, `models`, `services`, `telegram`, `api`.
+Subpackages: `core`, `db`, `models`, `services`, `telegram`, `api`, `bot`.

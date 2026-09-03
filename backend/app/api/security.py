@@ -13,12 +13,18 @@ CallNext = Callable[[Request], Awaitable[Response]]
 
 
 class AuthenticationMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: object, service: AuthService) -> None:
+    def __init__(
+        self,
+        app: object,
+        service: AuthService,
+        public_paths: frozenset[str] = PUBLIC_PATHS,
+    ) -> None:
         super().__init__(app)
         self._service = service
+        self._public_paths = public_paths
 
     async def dispatch(self, request: Request, call_next: CallNext) -> Response:
-        if request.method == "OPTIONS" or request.url.path in PUBLIC_PATHS:
+        if request.method == "OPTIONS" or request.url.path in self._public_paths:
             return await call_next(request)
 
         username = self._service.identify(request.cookies.get(settings.cookie_name))

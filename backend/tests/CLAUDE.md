@@ -16,6 +16,10 @@ Mirrors the `app/` package layout.
 - `api/test_panel.py` — auth enforcement, filters, pagination, embedded rows,
   message links, task history, `404`s and rejected filters.
 - `telegram/test_tags.py` — tag matching.
+- `bot/test_report.py` — the PDF builds, carries a link for a group task and
+  none for a private one, and survives an empty list.
+- `bot/test_webhook.py` — the secret header guards the route while the rest of
+  the API stays behind the session cookie.
 - `telegram/test_client.py` — session cloning while the file is held open.
 - `telegram/test_digest.py` — send pacing, with `asyncio.sleep` recorded
   instead of awaited.

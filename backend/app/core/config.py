@@ -33,5 +33,9 @@ class Settings(BaseSettings):
     cookie_name: str = "session"
     cookie_secure: bool = True
 
+    bot_token: str = ""
+    bot_webhook_url: str = ""
+    bot_webhook_secret: str = ""
+
 
 settings = Settings()

@@ -4,6 +4,10 @@ import logging
 import uvicorn
 
 from app.api.app import create_app
+from app.bot.client import create_bot
+from app.bot.handlers import BotHandlers
+from app.bot.report import TaskReport
+from app.bot.webhook import BotWebhook
 from app.core.config import settings
 from app.core.security import TokenIssuer
 from app.db.chats import ChatRepository
@@ -46,6 +50,23 @@ class Services:
         self.auth = build_auth()
 
 
+def build_bot(services: Services) -> BotWebhook | None:
+    if not settings.bot_token:
+        logger.warning("BOT_TOKEN is not set, the bot is disabled")
+        return None
+
+    handlers = BotHandlers(
+        employees=services.employees,
+        tasks=services.tasks,
+        report=TaskReport(settings.timezone),
+    )
+    return BotWebhook(
+        create_bot(settings.bot_token),
+        handlers.dispatcher(),
+        settings.bot_webhook_secret,
+    )
+
+
 async def run() -> None:
     logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
     logging.getLogger("telethon").setLevel(logging.WARNING)
@@ -58,6 +79,8 @@ async def run() -> None:
     client = create_client(settings.session_path, settings.api_id, settings.api_hash)
     TaskEventHandler(client, MessageParser(client), services.tasks).register()
 
+    webhook = build_bot(services)
+
     server = uvicorn.Server(
         uvicorn.Config(
             create_app(
@@ -66,6 +89,7 @@ async def run() -> None:
                 stats=services.stats,
                 employees=services.employees,
                 chats=services.chats,
+                bot_routes=webhook.routes() if webhook else (),
             ),
             host=settings.host,
             port=settings.port,
@@ -83,6 +107,8 @@ async def run() -> None:
         )
         await asyncio.gather(client.run_until_disconnected(), server.serve())
     finally:
+        if webhook is not None:
+            await webhook.close()
         await client.disconnect()
         await database.close()
 

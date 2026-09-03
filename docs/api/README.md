@@ -19,3 +19,4 @@ Telegram.
 - [tasks](tasks.md) — task list, task detail with history, unresolved messages.
 - [employees](employees.md) — employee list and per-employee stats.
 - [chats](chats.md) — chat list.
+- [bot](bot.md) — the Telegram bot webhook.

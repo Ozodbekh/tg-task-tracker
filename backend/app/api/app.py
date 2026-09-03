@@ -1,3 +1,5 @@
+from collections.abc import Sequence
+
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.middleware.cors import CORSMiddleware
@@ -10,7 +12,7 @@ from app.api.auth import AuthRoutes
 from app.api.directory import DirectoryRoutes
 from app.api.filters import FilterError
 from app.api.responses import invalid_filters
-from app.api.security import AuthenticationMiddleware
+from app.api.security import PUBLIC_PATHS, AuthenticationMiddleware
 from app.api.stats import StatsRoutes
 from app.api.tasks import TaskRoutes
 from app.core.config import settings
@@ -35,6 +37,7 @@ def create_app(
     stats: StatsService,
     employees: EmployeeService,
     chats: ChatService,
+    bot_routes: Sequence[Route] = (),
 ) -> Starlette:
     routes = [
         Route("/api/health", health, methods=["GET"]),
@@ -42,6 +45,7 @@ def create_app(
         *StatsRoutes(stats).routes(),
         *TaskRoutes(tasks).routes(),
         *DirectoryRoutes(employees, chats, stats).routes(),
+        *bot_routes,
     ]
 
     middleware = [
@@ -52,7 +56,11 @@ def create_app(
             allow_credentials=True,
             allow_methods=["GET", "POST", "PATCH", "DELETE"],
         ),
-        Middleware(AuthenticationMiddleware, service=auth),
+        Middleware(
+            AuthenticationMiddleware,
+            service=auth,
+            public_paths=PUBLIC_PATHS | {route.path for route in bot_routes},
+        ),
     ]
 
     return Starlette(

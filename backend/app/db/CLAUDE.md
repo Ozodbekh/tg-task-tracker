@@ -11,7 +11,7 @@ SQL and the SQLite connection. The only layer that writes SQL.
 - `employees.py` — `EmployeeRepository`: upsert by `telegram_id`, get, list.
 - `chats.py` — `ChatRepository`: upsert by `telegram_id`, get, list.
 - `tasks.py` — `TaskRepository`: task writes, events, unresolved messages, and
-  the read queries behind the panel lists.
+  the read queries behind the panel lists and the bot's report.
 - `stats.py` — `StatsRepository`: the aggregate queries behind the dashboard,
   plus the per-employee digest counts, which take no date window.
 - `seed.py` — `Seeder`, run through `make seed`. Wipes every table and writes a

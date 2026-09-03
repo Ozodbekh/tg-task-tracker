@@ -15,6 +15,8 @@ Business logic. The only caller of `db/`.
     resolved.
   - `list_views`, `detail`, `list_unresolved` serve the panel's read screens.
   - `find` reports whether a chat's message is already stored as a task.
+  - `outstanding` lists one employee's tasks that are neither done nor
+    cancelled, ordered open, in progress, on hold, blocked.
   - `capture`, `apply_status` and `record_unresolved` take an optional moment.
     History replay passes the message's own date; the live path leaves it out
     and gets `now`.
