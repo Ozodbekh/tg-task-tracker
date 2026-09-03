@@ -15,11 +15,17 @@ UPDATE_TYPES = ("message",)
 FILE_NAME = "tasklarim.pdf"
 
 START_TEXT = (
-    "Salom! Bu yerdan o'z tasklaringizni ko'rasiz.\n\n"
-    "/my_task yuboring — bajarilmagan tasklaringiz PDF bo'lib keladi.\n\n"
-    "Task holatini o'zgartirish avvalgidek Telegramda, task xabariga reply "
-    "qilib: #inp, #onhold, #blocked, #done, #cancel"
+    "Salom, {name}!\n\n"
+    "/my_task yuborsangiz, tasklaringiz ro'yxatini PDF qilib yuboraman.\n\n"
+    "Task holatini o'zgartirish avvalgidek Telegramda bo'ladi — task xabariga "
+    "reply qilib yozing:\n"
+    "#inp — boshladim\n"
+    "#onhold — vaqtincha to'xtatdim\n"
+    "#blocked — mendan bog'liq emas\n"
+    "#done — bajardim\n"
+    "#cancel — bekor qilindi"
 )
+HINT_TEXT = "Tasklaringizni ko'rish uchun /my_task yuboring."
 UNKNOWN_TEXT = "Sizni tizimda topa olmadim. Sizga hali task berilmagan bo'lishi mumkin."
 FAILED_TEXT = "Hisobot tayyorlanmadi. Administratorga xabar bering."
 
@@ -39,10 +45,21 @@ class BotHandlers:
         dispatcher = Dispatcher()
         dispatcher.message.register(self.start, CommandStart())
         dispatcher.message.register(self.my_tasks, Command(*COMMANDS))
+        dispatcher.message.register(self.hint)
         return dispatcher
 
     async def start(self, message: Message) -> None:
-        await message.answer(START_TEXT)
+        await message.answer(START_TEXT.format(name=self._name(message)))
+
+    async def hint(self, message: Message) -> None:
+        logger.info("Hint sent to %s", self._name(message))
+        await message.answer(HINT_TEXT)
+
+    @staticmethod
+    def _name(message: Message) -> str:
+        if message.from_user is None:
+            return "do'stim"
+        return message.from_user.first_name or message.from_user.full_name
 
     async def my_tasks(self, message: Message) -> None:
         if message.from_user is None:

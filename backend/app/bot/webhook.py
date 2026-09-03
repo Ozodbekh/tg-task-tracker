@@ -32,5 +32,6 @@ class BotWebhook:
             return JSONResponse({"detail": "Forbidden"}, status_code=403)
 
         update = Update.model_validate(await request.json(), context={"bot": self._bot})
+        logger.info("Update %s (%s)", update.update_id, update.event_type)
         await self._dispatcher.feed_update(self._bot, update)
         return Response(status_code=200)
