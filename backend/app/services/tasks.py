@@ -30,8 +30,10 @@ class TaskService:
         self._chats = chats
         self._employees = employees
 
-    async def capture(self, capture: TaskCapture) -> Task:
-        now = self._now()
+    async def capture(
+        self, capture: TaskCapture, moment: datetime | None = None
+    ) -> Task:
+        now = moment or self._now()
         chat = await self._chats.ensure(capture.chat)
         employee = await self._employees.ensure(capture.assignee)
         previous = await self._repository.get(chat.id, capture.message_id)
@@ -54,7 +56,9 @@ class TaskService:
             )
         return task
 
-    async def apply_status(self, change: StatusChange) -> Task | None:
+    async def apply_status(
+        self, change: StatusChange, moment: datetime | None = None
+    ) -> Task | None:
         task = await self._find_task(change.chat, change.task_message_id)
         if task is None:
             return None
@@ -65,7 +69,7 @@ class TaskService:
         if task.status is change.status:
             return task
 
-        now = self._now()
+        now = moment or self._now()
         updated = await self._repository.set_status(task.id, change.status, now)
         if updated is None:
             return None
@@ -142,11 +146,16 @@ class TaskService:
             page_size=pagination.page_size,
         )
 
-    async def record_unresolved(self, message: UnresolvedMessage) -> None:
+    async def record_unresolved(
+        self, message: UnresolvedMessage, moment: datetime | None = None
+    ) -> None:
         chat = await self._chats.ensure(message.chat)
         await self._repository.save_unresolved(
-            chat.id, message.message_id, message.text, self._now()
+            chat.id, message.message_id, message.text, moment or self._now()
         )
+
+    async def find(self, chat: ChatIdentity, message_id: int) -> Task | None:
+        return await self._find_task(chat, message_id)
 
     async def _find_task(self, identity: ChatIdentity, message_id: int) -> Task | None:
         chat = await self._chats.find(identity.telegram_id)

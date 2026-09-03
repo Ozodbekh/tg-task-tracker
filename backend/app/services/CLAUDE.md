@@ -14,6 +14,10 @@ Business logic. The only caller of `db/`.
   - `record_unresolved` stores a `#task` message whose assignee was not
     resolved.
   - `list_views`, `detail`, `list_unresolved` serve the panel's read screens.
+  - `find` reports whether a chat's message is already stored as a task.
+  - `capture`, `apply_status` and `record_unresolved` take an optional moment.
+    History replay passes the message's own date; the live path leaves it out
+    and gets `now`.
 - `stats.py` — `StatsService` maps the aggregate rows into models, pages the
   per-employee and per-chat rankings, and fills the timeseries gaps so the chart
   has a point per bucket.

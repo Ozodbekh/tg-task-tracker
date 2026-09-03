@@ -17,9 +17,10 @@ rules.
   case-insensitive and whole-tag. `tags` keeps the order they appear in, so a
   message with two status tags resolves to the first one, not an arbitrary one.
 - `parser.py` — `MessageParser` resolves the chat and the assignee. In a private
-  chat the assignee is the other party. In a group it tries, in order: a text
-  mention carrying a `user_id`, an `@username` mention, then the replied-to
-  message's sender.
+  chat the assignee is the other party. In a group `assignees` returns every
+  mentioned user in the order they appear, deduplicated, falling back to the
+  replied-to message's sender when nothing is mentioned; `assignee` takes the
+  first of them.
 - `handlers.py` — `TaskEventHandler` subscribes to `NewMessage` and
   `MessageEdited`.
 - `digest.py` — `DigestSender` renders the Uzbek task summary and sends it to
@@ -29,11 +30,20 @@ rules.
   The message is HTML: the header and every count are bold, so the employee name
   is escaped before it goes into the template.
 
+- `backfill.py` — `HistoryBackfill` walks a chat oldest to newest and feeds it
+  through the same rules as the live handler. It skips a message whose task is
+  already stored rather than re-capturing it, and only applies a status reply to
+  a task it captured in the same run, so replaying history can never move a
+  live task backwards. It sleeps every `SLEEP_EVERY` messages.
+
 Notes:
 
 - Only outgoing messages create tasks; incoming ones can only carry status tags.
 - On edit, an outgoing message that lost its `#task` tag cancels the task.
 - A `#task` message with no resolvable assignee is recorded as unresolved.
+- A message mentioning several people still makes one task, for the first of
+  them; `tasks` is unique on `(chat_id, message_id)`. The backfill counts and
+  logs these messages so they can be found.
 - `#cancel` from the assignee and a `#task` tag removed by an edit both land on
   `cancelled`; the edit path stores no comment, the reply path stores the text
   sent with the tag.

@@ -1,3 +1,5 @@
+from datetime import UTC, datetime
+
 import pytest
 
 from app.db.tasks import STATUS_TIMESTAMP_COLUMN
@@ -198,6 +200,44 @@ async def test_status_on_unknown_task_is_ignored(
         change_of(group, TaskStatus.DONE, assignee.telegram_id, task_message_id=999)
     )
     assert result is None
+
+
+BACKFILL_MOMENT = datetime(2026, 3, 14, 9, 30, tzinfo=UTC)
+LATER_MOMENT = datetime(2026, 3, 15, 16, 45, tzinfo=UTC)
+
+
+async def test_capture_honours_an_explicit_moment(
+    tasks: TaskService, group: ChatIdentity, assignee: EmployeeIdentity
+) -> None:
+    task = await tasks.capture(capture_of(group, assignee), BACKFILL_MOMENT)
+
+    assert task.created_at == BACKFILL_MOMENT
+
+
+async def test_status_honours_an_explicit_moment(
+    tasks: TaskService, group: ChatIdentity, assignee: EmployeeIdentity
+) -> None:
+    task = await tasks.capture(capture_of(group, assignee), BACKFILL_MOMENT)
+
+    done = await tasks.apply_status(
+        change_of(group, TaskStatus.DONE, assignee.telegram_id), LATER_MOMENT
+    )
+    assert done is not None
+    assert done.done_at == LATER_MOMENT
+
+    detail = await tasks.detail(task.id)
+    assert detail is not None
+    assert detail.events[0].created_at == BACKFILL_MOMENT
+    assert detail.events[-1].created_at == LATER_MOMENT
+
+
+async def test_capture_without_a_moment_still_uses_now(
+    tasks: TaskService, group: ChatIdentity, assignee: EmployeeIdentity
+) -> None:
+    before = datetime.now(UTC)
+    task = await tasks.capture(capture_of(group, assignee))
+
+    assert task.created_at >= before
 
 
 async def test_cancel_and_revive(

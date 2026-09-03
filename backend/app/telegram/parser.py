@@ -22,25 +22,42 @@ class MessageParser:
         )
 
     async def assignee(self, message: Message) -> EmployeeIdentity | None:
+        found = await self.assignees(message)
+        return found[0] if found else None
+
+    async def assignees(self, message: Message) -> list[EmployeeIdentity]:
         if message.is_private:
-            return self._identity(await message.get_chat())
+            identity = self._identity(await message.get_chat())
+            return [identity] if identity else []
 
-        user = await self._from_text_mention(message)
-        if user is None:
-            user = await self._from_username(message)
-        if user is None:
-            user = await self._from_reply(message)
-        return self._identity(user)
+        users = await self._mentioned(message)
+        if not users:
+            replied = await self._from_reply(message)
+            users = [replied] if replied else []
 
-    async def _from_text_mention(self, message: Message) -> User | None:
-        for entity, _ in message.get_entities_text(MessageEntityMentionName):
-            return await self._fetch(entity.user_id)
-        return None
+        found: list[EmployeeIdentity] = []
+        seen: set[int] = set()
+        for user in users:
+            if user.id in seen:
+                continue
+            seen.add(user.id)
+            identity = self._identity(user)
+            if identity is not None:
+                found.append(identity)
+        return found
 
-    async def _from_username(self, message: Message) -> User | None:
-        for _, text in message.get_entities_text(MessageEntityMention):
-            return await self._fetch(text.lstrip("@"))
-        return None
+    async def _mentioned(self, message: Message) -> list[User]:
+        users = []
+        for entity, text in message.get_entities_text():
+            if isinstance(entity, MessageEntityMentionName):
+                user = await self._fetch(entity.user_id)
+            elif isinstance(entity, MessageEntityMention):
+                user = await self._fetch(text.lstrip("@"))
+            else:
+                continue
+            if user is not None:
+                users.append(user)
+        return users
 
     @staticmethod
     async def _from_reply(message: Message) -> User | None:

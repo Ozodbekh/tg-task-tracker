@@ -88,9 +88,21 @@ spent in each status.
 - Edits made while the client is offline are not redelivered by Telegram and
   may be missed.
 
+## Backfill
+
+A chat's history can be replayed on demand with `python -m app.backfill
+<chat_id> [--apply]`. It reads the chat oldest to newest through the same
+parser and tags as the live listener, and stores each message with its own
+date rather than the time of the run.
+
+It never touches a task that is already stored, and applies a status reply only
+to a task captured in the same run, so a replay cannot undo what the listener
+has already recorded.
+
 ## Open
 
 - Deadlines.
 - Web panel scope and access.
-- History backfill on first run.
-- Several mentions in one message: one task or several.
+- Several mentions in one message: whether the ones after the first should get
+  a task of their own. That needs `tasks` to be unique on
+  `(chat_id, message_id, employee_id)`, which is a migration.
