@@ -31,7 +31,17 @@ class BotWebhook:
             logger.warning("Rejected a webhook call with a wrong secret")
             return JSONResponse({"detail": "Forbidden"}, status_code=403)
 
-        update = Update.model_validate(await request.json(), context={"bot": self._bot})
+        try:
+            update = Update.model_validate(
+                await request.json(), context={"bot": self._bot}
+            )
+        except ValueError:
+            logger.exception("Rejected an unreadable update")
+            return Response(status_code=200)
+
         logger.info("Update %s (%s)", update.update_id, update.event_type)
-        await self._dispatcher.feed_update(self._bot, update)
+        try:
+            await self._dispatcher.feed_update(self._bot, update)
+        except Exception:
+            logger.exception("Update %s failed", update.update_id)
         return Response(status_code=200)

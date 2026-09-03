@@ -4,6 +4,8 @@ import pytest
 from app.bot.handlers import UPDATE_TYPES, BotHandlers
 from app.bot.webhook import SECRET_HEADER, WEBHOOK_PATH
 
+from .conftest import SECRET
+
 UPDATE = {"update_id": 1}
 
 
@@ -36,3 +38,13 @@ async def test_the_rest_of_the_api_is_still_protected(
 
 def test_update_types_match_the_registered_handlers(handlers: BotHandlers) -> None:
     assert list(UPDATE_TYPES) == handlers.dispatcher().resolve_used_update_types()
+
+
+async def test_an_unreadable_update_is_accepted_not_retried(
+    client: httpx.AsyncClient,
+) -> None:
+    response = await client.post(
+        WEBHOOK_PATH, json={"nonsense": True}, headers={SECRET_HEADER: SECRET}
+    )
+
+    assert response.status_code == 200

@@ -25,6 +25,9 @@ Notes:
 - A bot cannot write to someone who has not pressed Start on it first.
 - The webhook route is public to the auth middleware and guards itself with the
   `X-Telegram-Bot-Api-Secret-Token` header, compared in constant time.
+- Every accepted update answers `200`, a failing handler included. Telegram
+  resends anything else, so a broken handler would loop; the traceback goes to
+  the log instead.
 - `report.py` needs a DejaVu font on the machine, from `fonts-dejavu-core`. It
   raises `MissingFontError` when there is none.
 - Without `BOT_TOKEN` the bot is not built and the rest of the app runs
