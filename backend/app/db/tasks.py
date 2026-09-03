@@ -32,13 +32,14 @@ SORT_COLUMNS: dict[str, str] = {
     "-done_at": "t.done_at DESC",
 }
 
-OUTSTANDING_ORDER = """
+STATUS_ORDER = """
     CASE t.status
         WHEN 'open' THEN 0
         WHEN 'in_progress' THEN 1
         WHEN 'on_hold' THEN 2
         WHEN 'blocked' THEN 3
-        ELSE 4
+        WHEN 'done' THEN 4
+        ELSE 5
     END
 """
 
@@ -184,16 +185,16 @@ class TaskRepository:
             rows = list(await cursor.fetchall())
         return rows, total
 
-    async def outstanding(self, employee_id: int) -> list[aiosqlite.Row]:
+    async def for_employee(self, employee_id: int) -> list[aiosqlite.Row]:
         async with self._database.cursor() as cursor:
             await cursor.execute(
                 f"""
                 SELECT {VIEW_COLUMNS}
                 FROM {VIEW_SOURCE}
-                WHERE t.employee_id = ? AND t.status NOT IN (?, ?)
-                ORDER BY {OUTSTANDING_ORDER}, t.created_at DESC
+                WHERE t.employee_id = ?
+                ORDER BY {STATUS_ORDER}, t.created_at DESC
                 """,
-                (employee_id, TaskStatus.DONE, TaskStatus.CANCELLED),
+                (employee_id,),
             )
             return list(await cursor.fetchall())
 

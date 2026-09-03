@@ -5,11 +5,12 @@ Separate from `telegram/`, which is the manager's user session and only reads.
 
 - `client.py` — builds the aiogram `Bot` from `BOT_TOKEN`, HTML parse mode.
 - `handlers.py` — `BotHandlers`: `/start` explains the bot, `/my_task` (also
-  `/mytask`) answers with the sender's unfinished tasks as a PDF. A sender with
-  no employee row is told so rather than ignored.
+  `/mytask`) answers with every task the sender has ever been given, as a PDF.
+  A sender with no employee row is told so rather than ignored.
 - `report.py` — `TaskReport` renders the PDF with `fpdf2`. Sections run open,
-  in progress, on hold, blocked; a group task carries a link back to the
-  message, a private one has none.
+  in progress, on hold, blocked, done, cancelled, and each task shows the date
+  it was given and whether it came from a group or a private chat. A group task
+  carries a link back to the message, a private one has none.
 - `webhook.py` — `BotWebhook`: the Starlette route Telegram posts to.
 - `setup.py` — run through `make set-webhook`. Points Telegram at
   `BOT_WEBHOOK_URL` + the route, publishes the command menu, then prints what

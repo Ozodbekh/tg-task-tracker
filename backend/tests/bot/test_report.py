@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from app.bot.report import EMPTY_NOTICE, TaskReport
+from app.bot.report import EMPTY_NOTICE, STATUS_TITLES, TaskReport, unfinished
 from app.models.chat import Chat, ChatType
 from app.models.employee import Employee
 from app.models.task import TaskStatus, TaskView
@@ -87,16 +87,8 @@ def test_an_empty_report_still_builds(report: TaskReport, employee: Employee) ->
     assert EMPTY_NOTICE
 
 
-@pytest.mark.parametrize(
-    "status",
-    [
-        TaskStatus.OPEN,
-        TaskStatus.IN_PROGRESS,
-        TaskStatus.ON_HOLD,
-        TaskStatus.BLOCKED,
-    ],
-)
-def test_every_unfinished_status_renders(
+@pytest.mark.parametrize("status", list(TaskStatus))
+def test_every_status_renders(
     report: TaskReport, employee: Employee, status: TaskStatus
 ) -> None:
     document = report.build(
@@ -104,3 +96,39 @@ def test_every_unfinished_status_renders(
     )
 
     assert document.startswith(b"%PDF")
+
+
+def test_every_status_has_a_section_title() -> None:
+    assert set(STATUS_TITLES) == set(TaskStatus)
+
+
+def test_done_and_cancelled_reach_the_document(
+    report: TaskReport, employee: Employee
+) -> None:
+    tasks = [
+        view_of(1, TaskStatus.OPEN, ChatType.GROUP, employee, None),
+        view_of(2, TaskStatus.DONE, ChatType.GROUP, employee, None),
+        view_of(3, TaskStatus.CANCELLED, ChatType.GROUP, employee, None),
+    ]
+
+    document = report.build(employee, tasks)
+
+    assert document.startswith(b"%PDF")
+    assert unfinished(tasks) == 1
+
+
+@pytest.mark.parametrize(
+    ("status", "expected"),
+    [
+        (TaskStatus.OPEN, 1),
+        (TaskStatus.IN_PROGRESS, 1),
+        (TaskStatus.ON_HOLD, 1),
+        (TaskStatus.BLOCKED, 1),
+        (TaskStatus.DONE, 0),
+        (TaskStatus.CANCELLED, 0),
+    ],
+)
+def test_unfinished_counts_only_live_work(
+    employee: Employee, status: TaskStatus, expected: int
+) -> None:
+    assert unfinished([view_of(1, status, ChatType.GROUP, employee, None)]) == expected

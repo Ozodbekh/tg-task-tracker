@@ -123,8 +123,8 @@ class TaskService:
             page_size=pagination.page_size,
         )
 
-    async def outstanding(self, employee_id: int) -> list[TaskView]:
-        rows = await self._repository.outstanding(employee_id)
+    async def for_employee(self, employee_id: int) -> list[TaskView]:
+        rows = await self._repository.for_employee(employee_id)
         return [to_task_view(row) for row in rows]
 
     async def detail(self, task_id: int) -> TaskDetail | None:

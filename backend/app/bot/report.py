@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 from fpdf import FPDF
 from fpdf.enums import XPos, YPos
 
+from app.models.chat import ChatType
 from app.models.employee import Employee
 from app.models.task import TaskStatus, TaskView
 
@@ -20,17 +21,30 @@ STATUS_TITLES: dict[TaskStatus, str] = {
     TaskStatus.IN_PROGRESS: "Jarayonda",
     TaskStatus.ON_HOLD: "Vaqtincha to'xtatilgan",
     TaskStatus.BLOCKED: "Kutilmoqda",
+    TaskStatus.DONE: "Bajarilgan",
+    TaskStatus.CANCELLED: "Bekor qilingan",
 }
+
+UNFINISHED = (
+    TaskStatus.OPEN,
+    TaskStatus.IN_PROGRESS,
+    TaskStatus.ON_HOLD,
+    TaskStatus.BLOCKED,
+)
 
 FULL_WIDTH = 0
 LINK_COLOR = (30, 90, 200)
 TEXT_COLOR = (0, 0, 0)
 LINK_LABEL = "Telegramda ochish"
-EMPTY_NOTICE = "Bajarilmagan task yo'q."
+EMPTY_NOTICE = "Sizda hali task yo'q."
 
 
 class MissingFontError(RuntimeError):
     pass
+
+
+def unfinished(tasks: list[TaskView]) -> int:
+    return sum(1 for task in tasks if task.status in UNFINISHED)
 
 
 def font_path() -> Path:
@@ -48,7 +62,7 @@ class TaskReport:
 
     def build(self, employee: Employee, tasks: list[TaskView]) -> bytes:
         document = self._document()
-        self._heading(document, employee, len(tasks))
+        self._heading(document, employee, tasks)
 
         if not tasks:
             document.set_font(FONT_NAME, size=11)
@@ -86,12 +100,15 @@ class TaskReport:
             new_y=YPos.NEXT,
         )
 
-    def _heading(self, document: FPDF, employee: Employee, total: int) -> None:
+    def _heading(
+        self, document: FPDF, employee: Employee, tasks: list[TaskView]
+    ) -> None:
         document.set_font(FONT_NAME, "B", 16)
         self._line(document, 8, employee.name)
 
         document.set_font(FONT_NAME, size=10)
-        self._line(document, 5, f"Bajarilmagan tasklar: {total}")
+        self._line(document, 5, f"Jami tasklar: {len(tasks)}")
+        self._line(document, 5, f"Bajarilmagan: {unfinished(tasks)}")
         self._line(document, 5, f"Hisobot: {self._moment(datetime.now(self._zone))}")
         document.ln(4)
 
@@ -110,7 +127,9 @@ class TaskReport:
 
         document.set_font(FONT_NAME, size=8)
         self._line(
-            document, 4, f"    {self._moment(task.created_at)} | {self._where(task)}"
+            document,
+            4,
+            f"    Berilgan: {self._moment(task.created_at)} | {self._where(task)}",
         )
 
         if task.message_link:
@@ -125,7 +144,9 @@ class TaskReport:
 
     @staticmethod
     def _where(task: TaskView) -> str:
-        return task.chat.title or "Shaxsiy chat"
+        if task.chat.type is ChatType.PRIVATE:
+            return "Shaxsiy chat"
+        return f"Guruh: {task.chat.title or task.chat.telegram_id}"
 
     def _moment(self, value: datetime) -> str:
         return value.astimezone(self._zone).strftime("%Y-%m-%d %H:%M")

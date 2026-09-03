@@ -4,7 +4,7 @@ from aiogram import Dispatcher
 from aiogram.filters import Command, CommandStart
 from aiogram.types import BufferedInputFile, Message
 
-from app.bot.report import TaskReport
+from app.bot.report import TaskReport, unfinished
 from app.services.employees import EmployeeService
 from app.services.tasks import TaskService
 
@@ -54,7 +54,7 @@ class BotHandlers:
             await message.answer(UNKNOWN_TEXT)
             return
 
-        tasks = await self._tasks.outstanding(employee.id)
+        tasks = await self._tasks.for_employee(employee.id)
         try:
             document = self._report.build(employee, tasks)
         except Exception:
@@ -64,6 +64,9 @@ class BotHandlers:
 
         await message.answer_document(
             BufferedInputFile(document, FILE_NAME),
-            caption=f"{employee.name}, bajarilmagan tasklaringiz: {len(tasks)}",
+            caption=(
+                f"{employee.name}\n"
+                f"Jami: {len(tasks)} | Bajarilmagan: {unfinished(tasks)}"
+            ),
         )
         logger.info("Sent %s tasks to %s", len(tasks), employee.name)
