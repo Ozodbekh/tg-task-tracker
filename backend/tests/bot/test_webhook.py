@@ -1,6 +1,7 @@
 import httpx
 import pytest
 
+from app.bot.handlers import UPDATE_TYPES, BotHandlers
 from app.bot.webhook import SECRET_HEADER, WEBHOOK_PATH
 
 UPDATE = {"update_id": 1}
@@ -31,3 +32,7 @@ async def test_the_rest_of_the_api_is_still_protected(
     client: httpx.AsyncClient, path: str
 ) -> None:
     assert (await client.get(path)).status_code == 401
+
+
+def test_update_types_match_the_registered_handlers(handlers: BotHandlers) -> None:
+    assert list(UPDATE_TYPES) == handlers.dispatcher().resolve_used_update_types()

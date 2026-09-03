@@ -11,6 +11,7 @@ from app.services.tasks import TaskService
 logger = logging.getLogger(__name__)
 
 COMMANDS = ("my_task", "mytask")
+UPDATE_TYPES = ("message",)
 FILE_NAME = "tasklarim.pdf"
 
 START_TEXT = (

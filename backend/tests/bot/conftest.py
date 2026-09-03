@@ -26,13 +26,24 @@ BASE_URL = "http://testserver"
 
 
 @pytest.fixture
-async def client(database: Database) -> AsyncIterator[httpx.AsyncClient]:
+def handlers(database: Database) -> BotHandlers:
     chats = ChatService(ChatRepository(database))
     employees = EmployeeService(EmployeeRepository(database))
     tasks = TaskService(
         repository=TaskRepository(database), chats=chats, employees=employees
     )
-    handlers = BotHandlers(employees, tasks, TaskReport("Asia/Tashkent"))
+    return BotHandlers(employees, tasks, TaskReport("Asia/Tashkent"))
+
+
+@pytest.fixture
+async def client(
+    database: Database, handlers: BotHandlers
+) -> AsyncIterator[httpx.AsyncClient]:
+    chats = ChatService(ChatRepository(database))
+    employees = EmployeeService(EmployeeRepository(database))
+    tasks = TaskService(
+        repository=TaskRepository(database), chats=chats, employees=employees
+    )
     webhook = BotWebhook(create_bot(TOKEN), handlers.dispatcher(), SECRET)
 
     application = create_app(

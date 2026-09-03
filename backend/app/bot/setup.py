@@ -4,6 +4,7 @@ import logging
 from aiogram.types import BotCommand
 
 from app.bot.client import create_bot
+from app.bot.handlers import UPDATE_TYPES
 from app.bot.webhook import WEBHOOK_PATH
 from app.core.config import settings
 
@@ -32,7 +33,10 @@ async def run() -> None:
     bot = create_bot(settings.bot_token)
     try:
         await bot.set_webhook(
-            url, secret_token=settings.bot_webhook_secret, drop_pending_updates=True
+            url,
+            secret_token=settings.bot_webhook_secret,
+            allowed_updates=list(UPDATE_TYPES),
+            drop_pending_updates=True,
         )
         await bot.set_my_commands(MENU)
 
@@ -42,6 +46,7 @@ async def run() -> None:
         logger.info("Webhook    %s", info.url)
         logger.info("Pending    %s", info.pending_update_count)
         logger.info("Last error %s", info.last_error_message or "-")
+        logger.info("Updates    %s", ", ".join(info.allowed_updates or UPDATE_TYPES))
     finally:
         await bot.session.close()
 

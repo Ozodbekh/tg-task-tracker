@@ -28,3 +28,7 @@ Notes:
   raises `MissingFontError` when there is none.
 - Without `BOT_TOKEN` the bot is not built and the rest of the app runs
   unchanged.
+- `UPDATE_TYPES` narrows what Telegram sends to what the handlers actually
+  read. A test compares it against `resolve_used_update_types`, so adding a
+  handler for a new update type fails until the list and the webhook follow.
+  Changing it means running `make set-webhook` again.
