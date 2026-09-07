@@ -13,11 +13,13 @@ from app.core.security import TokenIssuer
 from app.db.chats import ChatRepository
 from app.db.database import Database
 from app.db.employees import EmployeeRepository
+from app.db.migrate import Migrator
 from app.db.stats import StatsRepository
 from app.db.tasks import TaskRepository
 from app.services.auth import AuthService
 from app.services.chats import ChatService
 from app.services.employees import EmployeeService
+from app.services.staff import StaffService
 from app.services.stats import StatsService
 from app.services.tasks import TaskService
 from app.telegram.client import create_client
@@ -47,6 +49,7 @@ class Services:
             employees=self.employees,
         )
         self.stats = StatsService(StatsRepository(database), settings.timezone)
+        self.staff = StaffService(self.employees, self.tasks)
         self.auth = build_auth()
 
 
@@ -73,6 +76,7 @@ async def run() -> None:
 
     database = Database(settings.db_path)
     await database.connect()
+    await Migrator(database).verify()
 
     services = Services(database)
 
@@ -89,6 +93,7 @@ async def run() -> None:
                 stats=services.stats,
                 employees=services.employees,
                 chats=services.chats,
+                staff=services.staff,
                 bot_routes=webhook.routes() if webhook else (),
             ),
             host=settings.host,

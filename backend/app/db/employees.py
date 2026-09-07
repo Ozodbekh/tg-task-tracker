@@ -28,6 +28,17 @@ class EmployeeRepository:
             rows = await cursor.fetchall()
         return [Employee(**dict(row)) for row in rows]
 
+    async def set_left_at(
+        self, employee_id: int, moment: datetime | None
+    ) -> Employee | None:
+        async with self._database.cursor() as cursor:
+            await cursor.execute(
+                "UPDATE employees SET left_at = ? WHERE id = ? RETURNING *",
+                (moment.isoformat() if moment else None, employee_id),
+            )
+            row = await cursor.fetchone()
+        return Employee(**dict(row)) if row else None
+
     async def upsert(self, identity: EmployeeIdentity, now: datetime) -> Employee:
         async with self._database.cursor() as cursor:
             await cursor.execute(

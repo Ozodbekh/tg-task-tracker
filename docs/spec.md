@@ -99,6 +99,16 @@ It never touches a task that is already stored, and applies a status reply only
 to a task captured in the same run, so a replay cannot undo what the listener
 has already recorded.
 
+## Leaving
+
+An employee who leaves is marked, never deleted; their task history has to
+survive. `employees.left_at` carries the moment.
+
+Retiring cancels every task of theirs that is not finished, so unfinished work
+does not sit forever against someone who is gone. The daily digest skips them
+and the bot tells them they are no longer active. They stay in the employee
+list so their past work can still be filtered.
+
 ## Open
 
 - Deadlines.

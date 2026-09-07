@@ -27,6 +27,7 @@ START_TEXT = (
 )
 HINT_TEXT = "Tasklaringizni ko'rish uchun /my_task yuboring."
 UNKNOWN_TEXT = "Sizni tizimda topa olmadim. Sizga hali task berilmagan bo'lishi mumkin."
+LEFT_TEXT = "Siz endi tizimda faol emassiz. Savol bo'lsa rahbaringizga murojaat qiling."
 FAILED_TEXT = "Hisobot tayyorlanmadi. Administratorga xabar bering."
 
 
@@ -69,6 +70,11 @@ class BotHandlers:
         if employee is None:
             logger.info("Unknown user %s asked for tasks", message.from_user.id)
             await message.answer(UNKNOWN_TEXT)
+            return
+
+        if not employee.active:
+            logger.info("Retired employee %s asked for tasks", employee.name)
+            await message.answer(LEFT_TEXT)
             return
 
         tasks = await self._tasks.for_employee(employee.id)

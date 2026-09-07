@@ -127,6 +127,41 @@ class TaskRepository:
             row = await cursor.fetchone()
         return Task(**dict(row)) if row else None
 
+    async def cancel_unfinished(
+        self, employee_id: int, actor_id: int, now: datetime
+    ) -> int:
+        stamp = now.isoformat()
+        async with self._database.cursor() as cursor:
+            await cursor.execute(
+                """
+                UPDATE tasks SET status = ?, cancelled_at = ?
+                WHERE employee_id = ? AND status NOT IN (?, ?)
+                RETURNING id
+                """,
+                (
+                    TaskStatus.CANCELLED,
+                    stamp,
+                    employee_id,
+                    TaskStatus.DONE,
+                    TaskStatus.CANCELLED,
+                ),
+            )
+            identifiers = [row["id"] for row in await cursor.fetchall()]
+            if identifiers:
+                await cursor.executemany(
+                    """
+                    INSERT INTO task_events (
+                        task_id, status, actor_id, message_id, text, created_at
+                    )
+                    VALUES (?, ?, ?, 0, '', ?)
+                    """,
+                    [
+                        (task_id, TaskStatus.CANCELLED, actor_id, stamp)
+                        for task_id in identifiers
+                    ],
+                )
+        return len(identifiers)
+
     async def add_event(
         self,
         task_id: int,

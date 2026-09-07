@@ -123,6 +123,11 @@ class TaskService:
             page_size=pagination.page_size,
         )
 
+    async def cancel_unfinished_for(self, employee_id: int, actor_id: int) -> int:
+        return await self._repository.cancel_unfinished(
+            employee_id, actor_id, self._now()
+        )
+
     async def for_employee(self, employee_id: int) -> list[TaskView]:
         rows = await self._repository.for_employee(employee_id)
         return [to_task_view(row) for row in rows]

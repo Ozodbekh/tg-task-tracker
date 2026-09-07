@@ -17,6 +17,7 @@ from app.db.tasks import TaskRepository
 from app.services.auth import AuthService
 from app.services.chats import ChatService
 from app.services.employees import EmployeeService
+from app.services.staff import StaffService
 from app.services.stats import StatsService
 from app.services.tasks import TaskService
 
@@ -56,6 +57,7 @@ async def client(
         stats=StatsService(StatsRepository(database), "Asia/Tashkent"),
         employees=employees,
         chats=chats,
+        staff=StaffService(employees, tasks),
         bot_routes=webhook.routes(),
     )
 

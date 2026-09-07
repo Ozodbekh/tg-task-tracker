@@ -175,6 +175,7 @@ class StatsRepository:
         sql = f"""
             SELECT e.telegram_id, e.name, {COUNT_COLUMNS}
             FROM {DIGEST_SOURCE}
+            WHERE e.left_at IS NULL
             GROUP BY e.id
             ORDER BY e.name
         """

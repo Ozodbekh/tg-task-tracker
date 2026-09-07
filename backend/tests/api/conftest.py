@@ -14,6 +14,7 @@ from app.db.tasks import TaskRepository
 from app.services.auth import AuthService
 from app.services.chats import ChatService
 from app.services.employees import EmployeeService
+from app.services.staff import StaffService
 from app.services.stats import StatsService
 from app.services.tasks import TaskService
 
@@ -32,18 +33,20 @@ async def seeded(database: Database) -> Database:
 async def client(seeded: Database) -> AsyncIterator[httpx.AsyncClient]:
     chats = ChatService(ChatRepository(seeded))
     employees = EmployeeService(EmployeeRepository(seeded))
+    tasks = TaskService(
+        repository=TaskRepository(seeded), chats=chats, employees=employees
+    )
     application = create_app(
         auth=AuthService(
             username=USERNAME,
             password_hash=PasswordHasher.hash(PASSWORD),
             issuer=TokenIssuer("secret", ttl_minutes=60),
         ),
-        tasks=TaskService(
-            repository=TaskRepository(seeded), chats=chats, employees=employees
-        ),
+        tasks=tasks,
         stats=StatsService(StatsRepository(seeded), "Asia/Tashkent"),
         employees=employees,
         chats=chats,
+        staff=StaffService(employees, tasks),
     )
     transport = httpx.ASGITransport(app=application)
     async with httpx.AsyncClient(transport=transport, base_url=BASE_URL) as client:

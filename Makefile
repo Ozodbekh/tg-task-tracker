@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help install hash-password login set-webhook seed run digest test lint format check clean
+.PHONY: help install hash-password login set-webhook migrate seed run digest test lint format check clean
 
 help:
 	@grep -E '^[a-z-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "%-10s %s\n", $$1, $$2}'
@@ -15,6 +15,9 @@ login: ## Sign in to Telegram and write the session file
 
 set-webhook: ## Point the Telegram bot at this server and publish its commands
 	uv run python -m app.bot.setup
+
+migrate: ## Apply pending database migrations
+	uv run python -m app.migrate
 
 seed: ## Fill the database with fake rows for UI testing
 	uv run python -m app.db.seed

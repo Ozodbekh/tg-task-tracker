@@ -7,8 +7,8 @@ Authentication is a JWT in an httpOnly cookie. Requests must be sent with
 credentials included; every endpoint except the ones marked otherwise answers
 `401` without a valid cookie.
 
-The API is read-only apart from login and logout. Task statuses change in
-Telegram.
+The API is read-only apart from login, logout and retiring an employee. Task
+statuses change in Telegram.
 
 ## Resources
 

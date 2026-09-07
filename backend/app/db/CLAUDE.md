@@ -5,7 +5,13 @@ SQL and the SQLite connection. The only layer that writes SQL.
 - `database.py` — `Database` owns a single aiosqlite connection, applies
   `schema.sql` on connect, and hands out cursors that commit on success and roll
   back on failure.
-- `schema.sql` — full schema, applied idempotently on every start.
+- `schema.sql` — the base schema, applied idempotently on every start. Later
+  changes live in `migrations/`, never here.
+- `migrate.py` — `Migrator`: `apply` runs the pending files in `migrations/`
+  and records them in `schema_migrations`; `verify` raises when any are
+  outstanding. Every entry point calls `verify` right after connecting, so a
+  database behind the code fails loudly instead of at the first query.
+- `migrations/` — numbered `.sql` files, applied once each, in name order.
 - `filters.py` — turns `TaskFilters` and a `DateRange` into a parameterised
   `WHERE` clause, and names the two `FROM` sources every query joins through.
 - `employees.py` — `EmployeeRepository`: upsert by `telegram_id`, get, list.

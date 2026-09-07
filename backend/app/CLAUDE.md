@@ -9,6 +9,8 @@ The backend application package.
 - `digest.py` — one-shot entry point behind `make digest`: wires the database
   and the Telegram client, sends every employee with unfinished work their
   task summary, then exits. It refuses to run without an authorized session.
+- `migrate.py` — one-shot entry point behind `make migrate`: applies pending
+  database migrations and prints what it did.
 - `backfill.py` — one-shot entry point, `python -m app.backfill <chat_id>
   [--apply]`. Replays a chat's whole history through the same parser and tags
   the listener uses. Without `--apply` it writes nothing and only reports.

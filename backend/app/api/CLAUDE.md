@@ -21,10 +21,11 @@ logic.
 - `directory.py` — `DirectoryRoutes`: employee list, per-employee stats, chat
   list. An employee with no task in the range gets a zeroed row, not a `404`.
   The two listings are deliberately unpaginated; they fill filter dropdowns.
+  `retire` and `restore` are the only write endpoints outside auth.
 
 Notes:
 
-- The API is read-only apart from login and logout.
+- The API is read-only apart from login, logout and retiring an employee.
 - There is one account, from `ADMIN_USERNAME` and `ADMIN_PASSWORD_HASH`.
 - `CORS_ORIGINS` must list real origins in production: browsers refuse
   credentialed requests against a wildcard.

@@ -47,7 +47,8 @@ Errors: `400` with `{ "detail": "Invalid filters" }` for an unknown `period`,
 
 ## Shared shapes
 
-- `employee` — `{ id, telegram_id, name, created_at }`.
+- `employee` — `{ id, telegram_id, name, created_at, left_at }`. `left_at` is
+  `null` for everyone still with the company.
 - `chat` — `{ id, telegram_id, type, title, created_at }`. `title` is `null` for
   private chats.
 - `by_status` — `{ open, in_progress, on_hold, blocked, done, cancelled }`,

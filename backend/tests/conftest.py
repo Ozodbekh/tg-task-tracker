@@ -14,6 +14,7 @@ os.environ.setdefault("COOKIE_SECURE", "false")
 from app.db.chats import ChatRepository
 from app.db.database import Database
 from app.db.employees import EmployeeRepository
+from app.db.migrate import Migrator
 from app.db.tasks import TaskRepository
 from app.models.chat import ChatIdentity, ChatType
 from app.models.employee import EmployeeIdentity
@@ -26,6 +27,7 @@ from app.services.tasks import TaskService
 async def database(tmp_path: Path) -> AsyncIterator[Database]:
     database = Database(tmp_path / "test.db")
     await database.connect()
+    await Migrator(database).apply()
     yield database
     await database.close()
 

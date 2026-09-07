@@ -9,6 +9,8 @@ Mirrors the `app/` package layout.
   status flow, rejected status replies, cancel and revive, chat isolation.
 - `services/test_auth.py` — password hashing, token issuing, expiry, foreign
   secrets.
+- `services/test_staff.py` — retiring cancels the unfinished work as `Panel`,
+  stops the digest, survives a repeat, and a later task does not un-retire.
 - `services/test_digest.py` — counts per status, old tasks, employees without a
   task, employees who finished everything, and the rendered message.
 - `api/conftest.py` — a seeded database behind an `httpx.AsyncClient` driving

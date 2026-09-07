@@ -5,6 +5,7 @@ from tempfile import TemporaryDirectory
 
 from app.core.config import settings
 from app.db.database import Database
+from app.db.migrate import Migrator
 from app.db.stats import StatsRepository
 from app.services.digest import DigestService
 from app.telegram.client import clone_session, create_client
@@ -22,6 +23,7 @@ async def run() -> None:
 
     database = Database(settings.db_path)
     await database.connect()
+    await Migrator(database).verify()
 
     with TemporaryDirectory() as directory:
         session = Path(directory) / settings.session_path.name

@@ -6,6 +6,9 @@ from app.models.employee import Employee
 from app.models.stats import StatusCounts
 from app.models.task import TaskEventView, TaskView, UnresolvedView
 
+PANEL_ACTOR = 0
+PANEL_NAME = "Panel"
+
 
 def to_chat(row: aiosqlite.Row) -> Chat:
     return Chat(
@@ -24,6 +27,10 @@ def to_employee(row: aiosqlite.Row) -> Employee:
         name=row["employee_name"],
         created_at=row["employee_created_at"],
     )
+
+
+def _actor(actor_id: int) -> str:
+    return PANEL_NAME if actor_id == PANEL_ACTOR else str(actor_id)
 
 
 def to_task_view(row: aiosqlite.Row) -> TaskView:
@@ -47,7 +54,7 @@ def to_event_view(row: aiosqlite.Row) -> TaskEventView:
     return TaskEventView(
         id=row["id"],
         status=row["status"],
-        actor_name=row["actor_name"] or str(row["actor_id"]),
+        actor_name=row["actor_name"] or _actor(row["actor_id"]),
         message_id=row["message_id"],
         text=row["text"],
         created_at=row["created_at"],

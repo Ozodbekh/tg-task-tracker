@@ -30,7 +30,13 @@ Business logic. The only caller of `db/`.
   been given, with no date window. Employees with no task at all are absent
   from the result, and so are those whose every task is already `done` — there
   is nothing to remind them of.
-- `views.py` — row-to-model mapping and the shared `completion_rate` formula.
+- `staff.py` — `StaffService.retire` stamps `left_at` and cancels everything
+  the employee had left, as `PANEL_ACTOR`; `restore` clears the stamp and
+  leaves the cancelled tasks cancelled. It composes the two services rather
+  than living on either, since `TaskService` already depends on
+  `EmployeeService`.
+- `views.py` — row-to-model mapping, the shared `completion_rate` formula, and
+  the `PANEL_ACTOR` id whose events read as `Panel`.
 
 Notes:
 

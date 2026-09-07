@@ -19,3 +19,8 @@ class EmployeeService:
 
     async def list_all(self) -> list[Employee]:
         return await self._repository.list_all()
+
+    async def set_left_at(
+        self, employee_id: int, moment: datetime | None
+    ) -> Employee | None:
+        return await self._repository.set_left_at(employee_id, moment)

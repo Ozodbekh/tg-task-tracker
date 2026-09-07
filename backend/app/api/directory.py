@@ -8,6 +8,7 @@ from app.models.employee import Employee
 from app.models.stats import EmployeeStats, StatusCounts
 from app.services.chats import ChatService
 from app.services.employees import EmployeeService
+from app.services.staff import StaffService
 from app.services.stats import StatsService
 
 
@@ -29,10 +30,12 @@ class DirectoryRoutes:
         employees: EmployeeService,
         chats: ChatService,
         stats: StatsService,
+        staff: StaffService,
     ) -> None:
         self._employees = employees
         self._chats = chats
         self._stats = stats
+        self._staff = staff
 
     def routes(self) -> list[Route]:
         return [
@@ -41,6 +44,16 @@ class DirectoryRoutes:
                 "/api/employees/{employee_id:int}/stats",
                 self.employee_stats,
                 methods=["GET"],
+            ),
+            Route(
+                "/api/employees/{employee_id:int}/retire",
+                self.retire,
+                methods=["POST"],
+            ),
+            Route(
+                "/api/employees/{employee_id:int}/restore",
+                self.restore,
+                methods=["POST"],
             ),
             Route("/api/chats", self.chats, methods=["GET"]),
         ]
@@ -56,6 +69,14 @@ class DirectoryRoutes:
 
         stats = await self._stats.for_employee(parse_filters(request), employee_id)
         return model(stats or empty_stats(employee))
+
+    async def retire(self, request: Request) -> Response:
+        retirement = await self._staff.retire(request.path_params["employee_id"])
+        return model(retirement) if retirement else not_found()
+
+    async def restore(self, request: Request) -> Response:
+        employee = await self._staff.restore(request.path_params["employee_id"])
+        return model(employee) if employee else not_found()
 
     async def chats(self, request: Request) -> Response:
         return models(await self._chats.list_all())

@@ -19,6 +19,7 @@ from app.core.config import settings
 from app.services.auth import AuthService
 from app.services.chats import ChatService
 from app.services.employees import EmployeeService
+from app.services.staff import StaffService
 from app.services.stats import StatsService
 from app.services.tasks import TaskService
 
@@ -37,6 +38,7 @@ def create_app(
     stats: StatsService,
     employees: EmployeeService,
     chats: ChatService,
+    staff: StaffService,
     bot_routes: Sequence[Route] = (),
 ) -> Starlette:
     routes = [
@@ -44,7 +46,7 @@ def create_app(
         *AuthRoutes(auth).routes(),
         *StatsRoutes(stats).routes(),
         *TaskRoutes(tasks).routes(),
-        *DirectoryRoutes(employees, chats, stats).routes(),
+        *DirectoryRoutes(employees, chats, stats, staff).routes(),
         *bot_routes,
     ]
 
