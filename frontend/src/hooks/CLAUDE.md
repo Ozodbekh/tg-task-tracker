@@ -5,7 +5,8 @@ React contexts and data access.
 - `AuthContext.tsx` — `AuthProvider` / `useAuth`: session restore on load, sign
   in, sign out, and `expired` when the cookie stopped being accepted.
 - `FiltersContext.tsx` — `FiltersProvider` / `useFilters`: the filter state
-  shared by every screen, plus the chat and employee lists the dropdowns need.
+  shared by every screen, plus the chat and employee lists the dropdowns need
+  and `reloadEmployees`, for after a write changes one.
 - `useResource.ts` — loads one endpoint into `{ data, loading, error, reload }`
   and drops results from a stale request.
 - `useTheme.ts` — light/dark, written to `data-theme` and `localStorage`.

@@ -17,6 +17,7 @@ import { useResource } from "@/hooks/useResource";
 import { bucketFor, periodLabel } from "@/lib/filters";
 import {
   chatName,
+  formatDate,
   formatDateTime,
   formatDuration,
   formatNumber,
@@ -27,9 +28,11 @@ import {
 export function EmployeeDetailPage() {
   const { id } = useParams();
   const employeeId = Number(id);
-  const { filters } = useFilters();
+  const { filters, employees } = useFilters();
   const scoped = { ...filters, employee_id: employeeId };
   const key = JSON.stringify(scoped);
+
+  const leftAt = employees.find((employee) => employee.id === employeeId)?.left_at ?? null;
 
   const stats = useResource(() => backend.employee(employeeId, scoped), [key]);
   const timeseries = useResource(() => backend.timeseries(scoped), [key]);
@@ -68,10 +71,14 @@ export function EmployeeDetailPage() {
             <div className="row">
               <span className="avatar avatar-lg">{initials(data.employee.name)}</span>
               <div className="stack">
-                <span style={{ fontSize: 17, fontWeight: 650 }}>{data.employee.name}</span>
+                <span className="row" style={{ gap: 8 }}>
+                  <span style={{ fontSize: 17, fontWeight: 650 }}>{data.employee.name}</span>
+                  {leftAt && <span className="badge badge-neutral">Ketgan</span>}
+                </span>
                 <span className="cell-sub">
                   Telegram ID {data.employee.telegram_id} · ro'yxatda{" "}
                   {formatDateTime(data.employee.created_at)}
+                  {leftAt && ` · ${formatDate(leftAt)} da ketgan`}
                 </span>
               </div>
             </div>

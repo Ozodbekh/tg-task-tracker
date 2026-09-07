@@ -823,6 +823,55 @@ tbody tr.clickable:hover {
   z-index: 50;
 }
 
+.dialog-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 24, 40, 0.35);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  z-index: 60;
+}
+
+.dialog {
+  width: min(420px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.danger-button {
+  background: var(--danger);
+}
+
+.notice {
+  margin: 0;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--done);
+}
+
+.retired td {
+  opacity: 0.55;
+}
+
+.retired td:last-child {
+  opacity: 1;
+}
+
 @media (max-width: 1240px) {
   .grid-2 {
     grid-template-columns: 1fr;

@@ -11,6 +11,7 @@ export interface Employee {
   telegram_id: number;
   name: string;
   created_at: string;
+  left_at: string | null;
 }
 
 export interface Chat {
@@ -109,6 +110,11 @@ export interface ChatStats {
   unresolved: number;
   participants: number;
   last_task_at: string | null;
+}
+
+export interface RetiredEmployee {
+  employee: Employee;
+  cancelled_tasks: number;
 }
 
 export interface Paginated<T> {

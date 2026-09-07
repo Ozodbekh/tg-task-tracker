@@ -12,6 +12,8 @@ Presentational components. They receive data, they do not fetch it.
   place status colors and their display order are defined.
 - `StatusSplitBar.tsx` — status distribution as a single bar, plus its legend.
 - `StateBlock.tsx` — empty/error block and the loading `Skeleton`.
+- `ConfirmDialog.tsx` — modal confirmation for a write, with pending and error
+  state.
 - `Pagination.tsx` — page controls and the row-count line, shared by every list.
 - `TaskDrawer.tsx` — task details and status history in a side panel.
 - `charts/` — `TasksTrendChart`, `StatusDonut`, `StackedBarChart`.

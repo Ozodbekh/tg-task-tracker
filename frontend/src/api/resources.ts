@@ -8,6 +8,7 @@ import type {
   EmployeeStats,
   Overview,
   Paginated,
+  RetiredEmployee,
   Session,
   Task,
   TaskDetail,
@@ -50,6 +51,8 @@ export const backend = {
   employees: () => api.get<Employee[]>("/api/employees"),
   employee: (id: number, filters: Filters) =>
     api.get<EmployeeStats>(`/api/employees/${id}/stats`, filtersToQuery(filters)),
+  retireEmployee: (id: number) => api.post<RetiredEmployee>(`/api/employees/${id}/retire`),
+  restoreEmployee: (id: number) => api.post<Employee>(`/api/employees/${id}/restore`),
   chats: () => api.get<Chat[]>("/api/chats"),
 
   tasks: (query: TaskQuery) =>

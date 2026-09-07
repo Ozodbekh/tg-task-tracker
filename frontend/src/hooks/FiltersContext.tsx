@@ -12,6 +12,7 @@ interface FiltersValue {
   reset: () => void;
   chats: Chat[];
   employees: Employee[];
+  reloadEmployees: () => void;
 }
 
 const FiltersContext = createContext<FiltersValue | null>(null);
@@ -28,8 +29,9 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
       reset: () => setState(DEFAULT_FILTERS),
       chats: chats.data ?? [],
       employees: employees.data ?? [],
+      reloadEmployees: employees.reload,
     }),
-    [filters, chats.data, employees.data],
+    [filters, chats.data, employees.data, employees.reload],
   );
 
   return <FiltersContext value={value}>{children}</FiltersContext>;

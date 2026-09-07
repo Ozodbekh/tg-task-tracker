@@ -116,7 +116,7 @@ export function FilterBar({
           <option value="">Barcha xodimlar</option>
           {employees.map((employee) => (
             <option key={employee.id} value={employee.id}>
-              {employee.name}
+              {employee.left_at ? `${employee.name} · ketgan` : employee.name}
             </option>
           ))}
         </select>

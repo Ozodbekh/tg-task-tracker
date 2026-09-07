@@ -6,7 +6,8 @@ The HTTP layer. Nothing else in the app calls `fetch`.
   cookies with every request and turns a non-2xx response into `ApiError` with
   the server's `detail`.
 - `resources.ts` — `backend`, one function per endpoint of `docs/api/`. Filters
-  are serialized by `lib/filters`.
+  are serialized by `lib/filters`. Apart from login and logout, the only writes
+  are `retireEmployee` and `restoreEmployee`.
 
 `204` returns `undefined`; empty query values are dropped rather than sent.
 

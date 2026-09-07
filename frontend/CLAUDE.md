@@ -1,7 +1,7 @@
 # Frontend
 
 React 19 + Vite + TypeScript. The manager's web panel: statistics, tasks,
-employees and chats, read-only.
+employees and chats. Read-only except for retiring and restoring an employee.
 
 Entry point for every frontend session. Read `../docs/rules/general.md` and
 `../docs/handoff/backend-to-frontend/` first. Do not read backend
